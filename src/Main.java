@@ -10,5 +10,13 @@ public class Main {
         //Will analyze the .asm for tokens
         Lexical lexical = new Lexical(fileName);
 
+        //Example usage of how the
+        while(true) {
+            Token t = lexical.getNextToken();
+            System.out.println(t.getValue());
+            if (t.getValue().equalsIgnoreCase("EOF")) {
+                break;
+            }
+        }
     }
 }

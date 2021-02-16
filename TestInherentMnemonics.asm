@@ -1,4 +1,26 @@
-dude that sucks
-but it's alright
-u can try
-again
+ halt
+ pop
+ dup
+ exit
+ ret
+ not 
+ and 
+ or  
+ xor 
+ neg 
+ inc 
+ dec 
+ add 
+ sub 
+ mul 
+ div 
+ rem 
+ shl 
+ shr 
+ teq 
+ tne 
+ tlt 
+ tgt 
+ tle 
+ tge 
+ halt       
