@@ -21,7 +21,7 @@ through a custom cross-assembler for the Cm Assembly Language.
 ### 3. Scan characters to extract and create tokens.
 - [x] a) Create a symbol table (for labels and mnemonics).
 - [x] b) Enter mnemonics (keywords) in the symbol table.
-- [x] c) Read characters from the input stream.4
+- [x] c) Read characters from the input stream.
 - [ ] d) Keep track of the position (line, column) of the token.
 - [x] e) Skip white spaces.
 - [ ] f) Scan comments.
