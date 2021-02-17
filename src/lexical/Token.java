@@ -3,12 +3,12 @@ package lexical;
 public class Token {
 
     private String value;
-    private String type;
+    private TokenType type;
 
     public Token() {
     }
 
-    public Token(String value, String type) {
+    public Token(String value, TokenType type) {
         this.value = value;
         this.type = type;
     }
@@ -21,11 +21,11 @@ public class Token {
         this.value = value;
     }
 
-    public String getType() {
+    public TokenType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(TokenType type) {
         this.type = type;
     }
 

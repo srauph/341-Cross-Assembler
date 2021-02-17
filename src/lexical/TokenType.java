@@ -1,12 +1,18 @@
 package lexical;
 
-public class TokenType {
-    public static String LABEL;
-    public static String INSTRUCTION;
-    public static String MNEMONIC;
-    public static String OPERAND;
-    public static String DIRECTIVE;
-    public static String COMMENT;
-    public static String EOL;
-    public static String EOF;
+public enum TokenType {
+    LABEL("Label"),
+    MNEMONIC("Mnemonic"),
+    INSTRUCTION("Instruction"),
+    OPERAND("Operand"),
+    DIRECTIVE("Directive"),
+    COMMENT("Comment"),
+    EOL("EOL"),
+    EOF("EOF"),
+    ;
+    private final String type;
+
+    TokenType(String type) {
+        this.type = type;
+    }
 }
