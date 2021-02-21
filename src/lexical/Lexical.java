@@ -67,7 +67,6 @@ public class Lexical {
     public Token getNextToken() {
         String alphabet = "[a-zA-Z]*$";
         StringBuilder sb = new StringBuilder();
-        boolean isLastCharALetter = false;
         Token tok = new Token();
         try {
             int c;
