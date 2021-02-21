@@ -72,18 +72,18 @@ public class Lexical {
         try {
             int c;
             while ((c = fis.read()) != -1) {
-                if ((char) c == '\n') { // end of line
+                if (c == 32) { // space
+                    continue;
+                }
+                if (String.valueOf((char) c).matches(alphabet)) { // mnemonic
+                    sb.append((char) c);
+                    tok.setType(TokenType.MNEMONIC);
+                }
+                if (c == 10) {
                     return new Token("EOL", TokenType.EOL);
                 }
-                if (StringUtils.isWhiteSpace((char) c) && isLastCharALetter) {
+                if (keywords.containsKey(sb.toString())) {
                     break;
-                } else {
-                    isLastCharALetter = false;
-                }
-                if (String.valueOf((char) c).matches(alphabet)) {
-                    sb.append((char) c);
-                    isLastCharALetter = true;
-                    tok.setType(TokenType.MNEMONIC);
                 }
             }
             if (sb.toString().equals("")) {
