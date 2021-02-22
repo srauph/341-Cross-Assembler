@@ -10,6 +10,10 @@ import java.io.IOException;
 
 public class Lexical {
 
+    private int lineNumber = 1;
+    private int columnNumber = 0;
+    private int currentColumn = 0;
+
     private FileInputStream fis = null;
     private SymbolTable<String, Integer> keywords;
 
@@ -71,7 +75,9 @@ public class Lexical {
         try {
             int c;
             while ((c = fis.read()) != -1) {
+                currentColumn++;
                 if (c == 32) { // space
+                    columnNumber++;
                     continue;
                 }
                 if (String.valueOf((char) c).matches(alphabet)) { // mnemonic
@@ -79,22 +85,28 @@ public class Lexical {
                     tok.setType(TokenType.MNEMONIC);
                 }
                 if (c == 10) {
-                    return new Token("EOL", TokenType.EOL);
+                    int EOLColumnNumber = currentColumn-1;
+                    columnNumber = 0;
+                    currentColumn = 0;
+                    lineNumber++;
+                    return new Token(new Position(lineNumber-1, EOLColumnNumber), "EOL", TokenType.EOL);
                 }
                 if (keywords.containsKey(sb.toString())) {
                     break;
                 }
             }
             if (sb.toString().equals("")) {
-                return new Token("EOF", TokenType.EOF);
+                return new Token(new Position(lineNumber, currentColumn), "EOF", TokenType.EOF);
             } else {
+                tok.setPosition(new Position(lineNumber, columnNumber));
                 tok.setValue(sb.toString());
+                columnNumber = currentColumn;
                 return tok;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new Token("EOF", TokenType.EOF);
+        return new Token(new Position(lineNumber, columnNumber+1), "EOF", TokenType.EOF);
     }
 
     public SymbolTable<String, Integer> getKeywords() {

@@ -2,13 +2,15 @@ package lexical;
 
 public class Token {
 
+    private Position pos;
     private String value;
     private TokenType type;
 
     public Token() {
     }
 
-    public Token(String value, TokenType type) {
+    public Token(Position pos, String value, TokenType type) {
+        this.pos = pos;
         this.value = value;
         this.type = type;
     }
@@ -29,8 +31,18 @@ public class Token {
         this.type = type;
     }
 
+    public Position getPosition() {
+        return pos;
+    }
+
+    public void setPosition(Position pos) { this.pos = pos; }
+
     @Override
     public String toString() {
-        return value;
+        return "Token{" +
+                "pos=" + pos +
+                ", value='" + value + '\'' +
+                ", type=" + type +
+                '}';
     }
 }
