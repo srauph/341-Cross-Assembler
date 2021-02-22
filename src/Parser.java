@@ -26,6 +26,7 @@ public class Parser {
         LineStatement ls = new LineStatement();
         // System.out.println("[Debug] Parsing tokens...");
         while (nextToken.getType() != TokenType.EOF) {
+//            System.out.println("[Debug]" + this.nextToken);
             // System.out.println("[Debug] Parsing Token " + nextToken.toString());
             /*
               Once the token is an EOL, the line statement is finished
@@ -44,6 +45,7 @@ public class Parser {
             //Get the next token to process
             getNextToken();
         }
+//        System.out.println("[Debug]" + this.nextToken);
         //System.out.println("[Debug] Done parsing tokens...");
         //System.out.println(Arrays.toString(intermediateRep.toArray()));
     }
