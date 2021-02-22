@@ -1,10 +1,10 @@
- halt/n
- pop/n
- dup/n
- exit/n
- ret/n
- not /n
- and /n
+ halt
+ pop
+ dup
+ exit
+ ret
+ not 
+ and 
  or  
  xor 
  neg 
