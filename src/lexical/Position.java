@@ -1,7 +1,7 @@
 package lexical;// Position.java - (c) 2001-2021 by Michel de Champlain
 
 public class Position {
-    Position(int lineNumber, int columnNumber) {
+    public Position(int lineNumber, int columnNumber) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
     }
