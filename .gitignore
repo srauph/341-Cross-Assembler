@@ -53,3 +53,9 @@ fabric.properties
 
 # *.iml
 # modules.xml
+/.metadata/
+.DS_Store
+.idea/*
+Sprint 2.iml
+*.xml
+*.DS_Store
