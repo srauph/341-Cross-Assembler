@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="754.6586356764928" y="348.0">lexical.Token</node>
+    <node x="520.6586356764928" y="348.0">utils.SymbolTable</node>
+    <node x="722.487717309146" y="614.0">lexical.Lexical</node>
+    <node x="338.32142857142856" y="670.5">utils.StringUtils</node>
+    <node x="461.7836356764929" y="935.5">CodeGenerator</node>
+    <node x="898.9503023431596" y="88.0">lexical.Position</node>
+    <node x="0.0" y="935.0">Parser</node>
+    <node x="101.36111111111109" y="658.5">LineStatement</node>
+    <node x="667.5336356764928" y="0.0">lexical.TokenType</node>
+    <node x="672.5116213151928" y="1184.0">Main</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="lexical.Lexical" target="lexical.Position">
+      <point x="114.42857142857133" y="-105.5" />
+      <point x="970.4162887377173" y="594.0" />
+      <point x="1015.1586356764928" y="594.0" />
+      <point x="1015.1586356764928" y="323.0" />
+      <point x="1018.1169690098263" y="323.0" />
+      <point x="47.66666666666674" y="61.0" />
+    </edge>
+    <edge source="lexical.Lexical" target="lexical.TokenType">
+      <point x="0.0" y="-105.5" />
+      <point x="855.987717309146" y="534.0" />
+      <point x="744.1586356764928" y="534.0" />
+      <point x="-25.75" y="149.0" />
+    </edge>
+    <edge source="Parser" target="LineStatement">
+      <point x="0.0" y="-94.5" />
+      <point x="159.5" y="895.0" />
+      <point x="119.36111111111109" y="895.0" />
+      <point x="-72.0" y="61.0" />
+    </edge>
+    <edge source="CodeGenerator" target="lexical.Lexical">
+      <point x="117.71428571428567" y="-94.0" />
+      <point x="785.4979213907786" y="915.0" />
+      <point x="833.737717309146" y="915.0" />
+      <point x="-22.25" y="105.5" />
+    </edge>
+    <edge source="lexical.Token" target="lexical.TokenType">
+      <point x="-93.74999999999989" y="-83.0" />
+      <point x="785.908635676493" y="323.0" />
+      <point x="796.2836356764928" y="323.0" />
+      <point x="25.75" y="149.0" />
+    </edge>
+    <edge source="CodeGenerator" target="utils.SymbolTable">
+      <point x="58.857142857142776" y="-94.0" />
+      <point x="726.6407785336357" y="875.0" />
+      <point x="661.8214285714286" y="875.0" />
+      <point x="661.8214285714286" y="574.0" />
+      <point x="618.1586356764928" y="574.0" />
+      <point x="0.0" y="83.0" />
+    </edge>
+    <edge source="Parser" target="lexical.TokenType">
+      <point x="-141.77777777777783" y="-94.5" />
+      <point x="17.72222222222217" y="905.0" />
+      <point x="57.861111111111086" y="905.0" />
+      <point x="57.861111111111086" y="323.0" />
+      <point x="693.2836356764928" y="323.0" />
+      <point x="-77.25" y="149.0" />
+    </edge>
+    <edge source="lexical.Token" target="lexical.Position">
+      <point x="31.250000000000114" y="-83.0" />
+      <point x="910.908635676493" y="323.0" />
+      <point x="922.7836356764928" y="323.0" />
+      <point x="-47.66666666666663" y="61.0" />
+    </edge>
+    <edge source="Parser" target="lexical.Token">
+      <point x="-35.44444444444446" y="-94.5" />
+      <point x="124.05555555555554" y="905.0" />
+      <point x="90.86111111111109" y="905.0" />
+      <point x="90.86111111111109" y="594.0" />
+      <point x="796.3253023431595" y="594.0" />
+      <point x="-83.33333333333337" y="83.0" />
+    </edge>
+    <edge source="CodeGenerator" target="utils.StringUtils">
+      <point x="-58.85714285714289" y="-94.0" />
+      <point x="608.92649281935" y="845.0" />
+      <point x="489.32142857142856" y="845.0" />
+      <point x="0.0" y="49.0" />
+    </edge>
+    <edge source="lexical.Lexical" target="utils.SymbolTable">
+      <point x="-114.42857142857144" y="-105.5" />
+      <point x="741.5591458805745" y="564.0" />
+      <point x="646.0157785336356" y="564.0" />
+      <point x="27.857142857142776" y="83.0" />
+    </edge>
+    <edge source="Main" target="CodeGenerator">
+      <point x="-13.333333333333371" y="-27.0" />
+      <point x="739.1782879818594" y="1144.0" />
+      <point x="564.7836356764928" y="1144.0" />
+      <point x="-103.0" y="94.0" />
+    </edge>
+    <edge source="CodeGenerator" target="LineStatement">
+      <point x="-176.57142857142856" y="-94.0" />
+      <point x="491.21220710506435" y="865.0" />
+      <point x="227.3611111111111" y="865.0" />
+      <point x="36.0" y="61.0" />
+    </edge>
+    <edge source="Main" target="Parser">
+      <point x="-66.66666666666674" y="-27.0" />
+      <point x="685.844954648526" y="1164.0" />
+      <point x="79.75" y="1164.0" />
+      <point x="-79.75" y="94.5" />
+    </edge>
+    <edge source="Parser" target="utils.SymbolTable">
+      <point x="-106.33333333333337" y="-94.5" />
+      <point x="53.16666666666663" y="915.0" />
+      <point x="68.86111111111109" y="915.0" />
+      <point x="68.86111111111109" y="574.0" />
+      <point x="534.5872071050643" y="574.0" />
+      <point x="-83.57142857142856" y="83.0" />
+    </edge>
+    <edge source="Parser" target="lexical.Lexical">
+      <point x="106.33333333333331" y="-94.5" />
+      <point x="265.8333333333333" y="895.0" />
+      <point x="744.737717309146" y="895.0" />
+      <point x="-111.25" y="105.5" />
+    </edge>
+    <edge source="Main" target="lexical.Lexical">
+      <point x="66.66666666666666" y="-27.0" />
+      <point x="819.1782879818594" y="1164.0" />
+      <point x="914.6586356764928" y="1164.0" />
+      <point x="914.6586356764928" y="915.0" />
+      <point x="967.237717309146" y="915.0" />
+      <point x="111.25" y="105.5" />
+    </edge>
+    <edge source="lexical.Lexical" target="lexical.Token">
+      <point x="38.14285714285711" y="-105.5" />
+      <point x="894.1305744520031" y="594.0" />
+      <point x="879.6586356764928" y="594.0" />
+      <point x="0.0" y="83.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.48202840339446296" x="521.7865099056708" y="653.8261240038249" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Constructors</Category>
+    <Category>Properties</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>Project Files</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
