@@ -76,7 +76,7 @@ public class Lexical {
             int c;
             while ((c = fis.read()) != -1) {
                 currentColumn++;
-                if (c == 32) { // space
+                if (StringUtils.isSpace(c)) { // space
                     columnNumber++;
                     continue;
                 }
@@ -84,7 +84,7 @@ public class Lexical {
                     sb.append((char) c);
                     tok.setType(TokenType.MNEMONIC);
                 }
-                if (c == 10) {
+                if (StringUtils.isEOL(c)) {
                     int EOLColumnNumber = currentColumn-1;
                     columnNumber = 0;
                     currentColumn = 0;

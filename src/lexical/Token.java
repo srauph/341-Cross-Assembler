@@ -1,6 +1,6 @@
 package lexical;
 
-public class Token {
+public class Token implements IToken {
 
     private Position pos;
     private String value;
