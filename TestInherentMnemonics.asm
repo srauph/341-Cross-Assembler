@@ -3,8 +3,8 @@
  dup
  exit
  ret
- not
- and
+ not 
+ and 
  or  
  xor 
  neg 

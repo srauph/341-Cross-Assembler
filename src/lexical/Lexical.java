@@ -19,7 +19,9 @@ public class Lexical {
 
     public Lexical(String inputFile) {
         try {
-            fis = new FileInputStream(inputFile);
+            File file  = new File(inputFile);
+            file.setWritable(false);
+            fis = new FileInputStream(file);
             keywords = new SymbolTable<>();
             initKeywordTable();
         } catch (FileNotFoundException e) {
@@ -76,7 +78,7 @@ public class Lexical {
             int c;
             while ((c = fis.read()) != -1) {
                 currentColumn++;
-                if (StringUtils.isSpace(c)) { // space
+                if (c == 32) { // space
                     columnNumber++;
                     continue;
                 }
@@ -84,7 +86,7 @@ public class Lexical {
                     sb.append((char) c);
                     tok.setType(TokenType.MNEMONIC);
                 }
-                if (StringUtils.isEOL(c)) {
+                if (c == 10) {
                     int EOLColumnNumber = currentColumn-1;
                     columnNumber = 0;
                     currentColumn = 0;

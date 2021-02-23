@@ -20,5 +20,3 @@ public class Position implements IPosition {
     private int lineNumber;
     private int columnNumber;
 }
-
-//position(1,2)
