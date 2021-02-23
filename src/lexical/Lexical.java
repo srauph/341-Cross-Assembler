@@ -19,7 +19,7 @@ public class Lexical {
 
     public Lexical(String inputFile) {
         try {
-            fis = new FileInputStream(new File(inputFile));
+            fis = new FileInputStream(inputFile);
             keywords = new SymbolTable<>();
             initKeywordTable();
         } catch (FileNotFoundException e) {

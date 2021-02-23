@@ -38,7 +38,7 @@ public class Parser {
                 ls = new LineStatement();
             }
             // checks if the token is a valid mnemonic keyword
-            if (keywords.containsKey(nextToken.getValue())) {
+            else if (keywords.containsKey(nextToken.getValue())) {
                 ls.setMnemonic(nextToken.getValue());
             }
 
