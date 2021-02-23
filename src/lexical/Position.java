@@ -1,6 +1,6 @@
 package lexical;
 
-public class Position {
+public class Position implements IPosition {
 
     public Position(int lineNumber, int columnNumber) {
         this.lineNumber = lineNumber;
