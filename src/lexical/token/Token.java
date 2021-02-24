@@ -1,26 +1,26 @@
-package lexical;
+package lexical.token;
 
 public class Token implements IToken {
 
     private Position pos;
-    private String value;
+    private String name;
     private TokenType type;
 
     public Token() {
     }
 
-    public Token(Position pos, String value, TokenType type) {
+    public Token(Position pos, String name, TokenType type) {
         this.pos = pos;
-        this.value = value;
+        this.name = name;
         this.type = type;
     }
 
-    public String getValue() {
-        return value;
+    public String getName() {
+        return name;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public TokenType getType() {
@@ -41,7 +41,7 @@ public class Token implements IToken {
     public String toString() {
         return "Token{" +
                 "pos=" + pos +
-                ", value='" + value + '\'' +
+                ", value='" + name + '\'' +
                 ", type=" + type +
                 '}';
     }

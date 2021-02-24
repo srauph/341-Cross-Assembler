@@ -1,6 +1,7 @@
 import lexical.Lexical;
-import lexical.Token;
-import lexical.TokenType;
+import lexical.token.Mnemonic;
+import lexical.token.Token;
+import lexical.token.TokenType;
 import utils.SymbolTable;
 
 import java.util.LinkedList;
@@ -9,10 +10,10 @@ public class Parser {
     //Sequence of line statements
     private final LinkedList<LineStatement> intermediateRep = new LinkedList<>();
     private final Lexical lexical;
-    private final SymbolTable<String, Integer> keywords;
+    private final SymbolTable<String, Token> keywords;
     private Token nextToken;
 
-    public Parser(Lexical lexical, SymbolTable<String, Integer> keywords) {
+    public Parser(Lexical lexical, SymbolTable<String, Token> keywords) {
         this.lexical = lexical;
         this.keywords = keywords;
         this.nextToken = lexical.getNextToken();
@@ -38,8 +39,8 @@ public class Parser {
                 ls = new LineStatement();
             }
             // checks if the token is a valid mnemonic keyword
-            else if (keywords.containsKey(nextToken.getValue())) {
-                ls.setMnemonic(nextToken.getValue());
+            else if (keywords.containsKey(nextToken.getName())) {
+                ls.setMnemonic((Mnemonic) nextToken);
             }
 
             //Get the next token to process

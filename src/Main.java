@@ -11,7 +11,6 @@ public class Main {
         String fileName = inputFile.replace(".asm", "");
 
 
-        HashMap<String, Integer> keyWordTable;
         //Will analyze the .asm for tokens
         Lexical lexical = new Lexical(inputFile);
 
@@ -23,5 +22,7 @@ public class Main {
         CodeGenerator codeGen = new CodeGenerator(lexical, lexical.getKeywords(), fileName);
         codeGen.copyIR(parser.getIR());
         codeGen.generateListing();
+
+        System.out.println("Done creating TestInherentMnemonics.lst file.");
     }
 }

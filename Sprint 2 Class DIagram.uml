@@ -4,19 +4,19 @@
   <OriginalElement />
   <nodes>
     <node x="44.4242630385487" y="210.0">LineStatement</node>
-    <node x="462.0608843537414" y="80.0">lexical.Token</node>
+    <node x="462.0608843537414" y="80.0">lexical.tokens.Token</node>
     <node x="443.6614512471655" y="210.0">lexical.Lexical</node>
-    <node x="366.5608843537414" y="0.0">lexical.TokenType</node>
+    <node x="366.5608843537414" y="0.0">lexical.tokens.TokenType</node>
     <node x="273.3108843537414" y="80.0">utils.SymbolTable</node>
     <node x="216.4242630385487" y="210.0">utils.StringUtils</node>
     <node x="334.78707482993195" y="360.0">CodeGenerator</node>
-    <node x="506.5608843537414" y="0.0">lexical.Position</node>
+    <node x="506.5608843537414" y="0.0">lexical.tokens.Position</node>
     <node x="396.0833333333333" y="450.0">Main</node>
     <node x="4.107596371882039" y="360.0">Parser</node>
   </nodes>
   <notes />
   <edges>
-    <edge source="lexical.Lexical" target="lexical.Position">
+    <edge source="lexical.Lexical" target="lexical.tokens.Position">
       <point x="44.571428571428555" y="-15.0" />
       <point x="540.232879818594" y="190.0" />
       <point x="591.9775510204081" y="190.0" />
@@ -24,7 +24,7 @@
       <point x="599.8942176870748" y="60.0" />
       <point x="37.33333333333337" y="15.0" />
     </edge>
-    <edge source="lexical.Lexical" target="lexical.TokenType">
+    <edge source="lexical.Lexical" target="lexical.tokens.TokenType">
       <point x="0.0" y="-15.0" />
       <point x="495.6614512471655" y="130.0" />
       <point x="419.8108843537414" y="130.0" />
@@ -44,7 +44,7 @@
       <point x="486.9947845804988" y="330.0" />
       <point x="-8.666666666666686" y="15.0" />
     </edge>
-    <edge source="lexical.Token" target="lexical.TokenType">
+    <edge source="lexical.tokens.Token" target="lexical.tokens.TokenType">
       <point x="-33.0" y="-15.0" />
       <point x="473.0608843537414" y="60.0" />
       <point x="441.5608843537414" y="60.0" />
@@ -58,7 +58,7 @@
       <point x="341.3108843537414" y="170.0" />
       <point x="0.0" y="15.0" />
     </edge>
-    <edge source="Parser" target="lexical.TokenType">
+    <edge source="Parser" target="lexical.tokens.TokenType">
       <point x="-42.66666666666663" y="-15.0" />
       <point x="9.44092970521541" y="340.0" />
       <point x="0.0" y="340.0" />
@@ -66,13 +66,13 @@
       <point x="381.5608843537414" y="60.0" />
       <point x="-45.0" y="15.0" />
     </edge>
-    <edge source="lexical.Token" target="lexical.Position">
+    <edge source="lexical.tokens.Token" target="lexical.tokens.Position">
       <point x="11.0" y="-15.0" />
       <point x="517.0608843537414" y="60.0" />
       <point x="525.2275510204081" y="60.0" />
       <point x="-37.333333333333314" y="15.0" />
     </edge>
-    <edge source="Parser" target="lexical.Token">
+    <edge source="Parser" target="lexical.tokens.Token">
       <point x="-10.666666666666657" y="-15.0" />
       <point x="41.44092970521538" y="310.0" />
       <point x="33.9242630385487" y="310.0" />
@@ -132,7 +132,7 @@
       <point x="283.02517006802714" y="170.0" />
       <point x="-58.28571428571428" y="15.0" />
     </edge>
-    <edge source="lexical.Lexical" target="lexical.Token">
+    <edge source="lexical.Lexical" target="lexical.tokens.Token">
       <point x="14.857142857142833" y="-15.0" />
       <point x="510.5185941043083" y="190.0" />
       <point x="506.0608843537414" y="190.0" />

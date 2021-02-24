@@ -1,4 +1,4 @@
-package lexical;
+package lexical.token;
 
 public interface IPosition {
     int getLineNumber();
