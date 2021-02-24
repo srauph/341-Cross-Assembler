@@ -12,7 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class Lexical {
+public class Scanner {
 
     private int lineNumber = 1;
     private int columnNumber = 0;
@@ -21,7 +21,7 @@ public class Lexical {
     private FileInputStream fis = null;
     private SymbolTable<String, Token> keywords;
 
-    public Lexical(String inputFile) {
+    public Scanner(String inputFile) {
         try {
             File file = new File(inputFile);
             file.setWritable(false);

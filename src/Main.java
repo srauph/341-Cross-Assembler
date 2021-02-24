@@ -1,6 +1,4 @@
-import lexical.Lexical;
-
-import java.util.HashMap;
+import lexical.Scanner;
 
 public class Main {
 
@@ -12,14 +10,14 @@ public class Main {
 
 
         //Will analyze the .asm for tokens
-        Lexical lexical = new Lexical(inputFile);
+        Scanner scanner = new Scanner(inputFile);
 
         //Using the lexical analyzer, parse them to generate a line of statements
-        Parser parser = new Parser(lexical, lexical.getKeywords());
+        Parser parser = new Parser(scanner, scanner.getKeywords());
         parser.parseTokens();
 
         //Copy over the (IR?) sequential list of line statements to be processed
-        CodeGenerator codeGen = new CodeGenerator(lexical, lexical.getKeywords(), fileName);
+        CodeGenerator codeGen = new CodeGenerator(scanner, scanner.getKeywords(), fileName);
         codeGen.copyIR(parser.getIR());
         codeGen.generateListing();
 

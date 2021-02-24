@@ -1,4 +1,4 @@
-import lexical.Lexical;
+import lexical.Scanner;
 import lexical.token.Mnemonic;
 import lexical.token.Token;
 import lexical.token.TokenType;
@@ -9,14 +9,14 @@ import java.util.LinkedList;
 public class Parser {
     //Sequence of line statements
     private final LinkedList<LineStatement> intermediateRep = new LinkedList<>();
-    private final Lexical lexical;
+    private final Scanner scanner;
     private final SymbolTable<String, Token> keywords;
     private Token nextToken;
 
-    public Parser(Lexical lexical, SymbolTable<String, Token> keywords) {
-        this.lexical = lexical;
+    public Parser(Scanner scanner, SymbolTable<String, Token> keywords) {
+        this.scanner = scanner;
         this.keywords = keywords;
-        this.nextToken = lexical.getNextToken();
+        this.nextToken = scanner.getNextToken();
     }
 
     /**
@@ -52,7 +52,7 @@ public class Parser {
     }
 
     private void getNextToken() {
-        this.nextToken = lexical.getNextToken();
+        this.nextToken = scanner.getNextToken();
     }
 
     public LinkedList<LineStatement> getIR() {
