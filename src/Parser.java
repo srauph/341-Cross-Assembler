@@ -6,7 +6,7 @@ import utils.SymbolTable;
 
 import java.util.LinkedList;
 
-public class Parser {
+public class Parser implements IParser {
     //Sequence of line statements
     private final LinkedList<LineStatement> intermediateRep = new LinkedList<>();
     private final LexicalScanner lexicalScanner;

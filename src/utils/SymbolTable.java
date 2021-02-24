@@ -6,7 +6,7 @@ import java.util.HashMap;
  * A symbol table utilizing a HashMap as its backend
  * Accepts any object type for Key and Value
  */
-public class SymbolTable<K, V> {
+public class SymbolTable<K, V> implements ISymbolTable<K, V> {
 
     private final HashMap<K, V> map;
 
