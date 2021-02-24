@@ -1,4 +1,4 @@
-import lexical.Scanner;
+import lexical.LexicalScanner;
 
 public class Main {
 
@@ -10,14 +10,14 @@ public class Main {
 
 
         //Will analyze the .asm for tokens
-        Scanner scanner = new Scanner(inputFile);
+        LexicalScanner lexicalScanner = new LexicalScanner(inputFile);
 
         //Using the lexical analyzer, parse them to generate a line of statements
-        Parser parser = new Parser(scanner, scanner.getKeywords());
+        Parser parser = new Parser(lexicalScanner, lexicalScanner.getKeywords());
         parser.parseTokens();
 
         //Copy over the (IR?) sequential list of line statements to be processed
-        CodeGenerator codeGen = new CodeGenerator(scanner, scanner.getKeywords(), fileName);
+        CodeGenerator codeGen = new CodeGenerator(lexicalScanner, lexicalScanner.getKeywords(), fileName);
         codeGen.copyIR(parser.getIR());
         codeGen.generateListing();
 

@@ -1,4 +1,4 @@
-import lexical.Scanner;
+import lexical.LexicalScanner;
 import lexical.token.Mnemonic;
 import lexical.token.Token;
 import utils.StringUtils;
@@ -10,13 +10,13 @@ import java.util.LinkedList;
 
 public class CodeGenerator {
     private final LinkedList<LineStatement> intermediateRep = new LinkedList<>();
-    private final Scanner scanner;
+    private final LexicalScanner lexicalScanner;
     private final SymbolTable<String, Token> keyword;
     // private final SymbolTable<??, ??> labels;  //future use in resolving labels during code generation
     private final String fileName;
 
-    public CodeGenerator(Scanner scanner, SymbolTable<String, Token> keyword, String fileName) {
-        this.scanner = scanner;
+    public CodeGenerator(LexicalScanner lexicalScanner, SymbolTable<String, Token> keyword, String fileName) {
+        this.lexicalScanner = lexicalScanner;
         this.fileName = fileName;
         this.keyword = keyword;
     }
