@@ -23,7 +23,7 @@ public class Lexical {
 
     public Lexical(String inputFile) {
         try {
-            File file  = new File(inputFile);
+            File file = new File(inputFile);
             file.setWritable(false);
             fis = new FileInputStream(file);
             keywords = new SymbolTable<>();
@@ -56,11 +56,11 @@ public class Lexical {
         keywords.put("div", new Mnemonic("div", 0x16));
         keywords.put("rem", new Mnemonic("rem", 0x17));
         keywords.put("shl", new Mnemonic("shl", 0x18));
-        keywords.put("shr",new Mnemonic("shr",  0x19));
-        keywords.put("teq",new Mnemonic("teq",  0x1A));
+        keywords.put("shr", new Mnemonic("shr", 0x19));
+        keywords.put("teq", new Mnemonic("teq", 0x1A));
         keywords.put("tne", new Mnemonic("tne", 0x1B));
         keywords.put("tlt", new Mnemonic("tlt", 0x1C));
-        keywords.put("tgt",new Mnemonic("tgt",  0x1D));
+        keywords.put("tgt", new Mnemonic("tgt", 0x1D));
         keywords.put("tle", new Mnemonic("tle", 0x1E));
         keywords.put("tge", new Mnemonic("tge", 0x1F));
         //Will add the rest when we get to there
@@ -80,34 +80,45 @@ public class Lexical {
         Mnemonic mne = null;
         try {
             int c;
+            //Read each character
             while ((c = fis.read()) != -1) {
                 currentColumn++;
-                if (c == 32) { // space
+                //If the character is a space, continue to next character
+                if (StringUtils.isSpace(c)) { // space
                     columnNumber++;
                     continue;
                 }
+                //If the character is a letter, we can assume it is a mnemonic (for now)
                 if (String.valueOf((char) c).matches(alphabet)) { // mnemonic
+                    //Append the character to start building the string
                     sb.append((char) c);
-                    if (mne == null){
+                    //If we're just starting to create the mnemonic, create the object
+                    if (mne == null) {
                         mne = new Mnemonic();
                     }
-                    mne.setType(TokenType.MNEMONIC);
                 }
-                if (c == 10) {
-                    int EOLColumnNumber = currentColumn-1;
+                // If the current character is an EOL character, return an EOL token
+                if (StringUtils.isEOL(c)) {
+                    int EOLColumnNumber = currentColumn - 1;
                     columnNumber = 0;
                     currentColumn = 0;
                     lineNumber++;
-                    return new Token(new Position(lineNumber-1, EOLColumnNumber), "EOL", TokenType.EOL);
+                    return new Token(new Position(lineNumber - 1, EOLColumnNumber), "EOL", TokenType.EOL);
                 }
+                //Verify the string being built if it os a valid mne and break if so
+                //This functionality will change when having to support other types of tokens
                 if (keywords.containsKey(sb.toString())) {
                     break;
                 }
             }
+            //Outside the loop, if the string is empty, return an EOF, the file is done being read
             if (sb.toString().equals("")) {
+                fis.close();
                 return new Token(new Position(lineNumber, currentColumn), "EOF", TokenType.EOF);
             } else {
+                //Broken out of the while loop from finding a valid mnemonic
                 if (mne != null) {
+                    //Set its position, name and return it.
                     mne.setPosition(new Position(lineNumber, columnNumber));
                     mne.setName(sb.toString());
                     columnNumber = currentColumn;
@@ -117,7 +128,12 @@ public class Lexical {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new Token(new Position(lineNumber, columnNumber+1), "EOF", TokenType.EOF);
+        try {
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new Token(new Position(lineNumber, columnNumber + 1), "EOF", TokenType.EOF);
     }
 
     public SymbolTable<String, Token> getKeywords() {
