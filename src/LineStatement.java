@@ -1,21 +1,23 @@
+import lexical.token.Mnemonic;
+
 public class LineStatement {
     //Label
-    private String mnemonic;
+    private Mnemonic mnemonic;
     //Operand
     //Comment
 
     public LineStatement() {
     }
 
-    public LineStatement(String mnemonic) {
+    public LineStatement(Mnemonic mnemonic) {
         this.mnemonic = mnemonic;
     }
 
-    public String getMnemonic() {
+    public Mnemonic getMnemonic() {
         return mnemonic;
     }
 
-    public void setMnemonic(String mnemonic) {
+    public void setMnemonic(Mnemonic mnemonic) {
         this.mnemonic = mnemonic;
     }
 

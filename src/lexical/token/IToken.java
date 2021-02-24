@@ -1,7 +1,7 @@
-package lexical;
+package lexical.token;
 
 public interface IToken {
     Position getPosition();
-    String getValue();
+    String getName();
     TokenType getType();
 }

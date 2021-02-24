@@ -1,6 +1,9 @@
-package lexical;
+package lexical.token;
 
 public class Position implements IPosition {
+
+    private final int lineNumber;
+    private final int columnNumber;
 
     public Position(int lineNumber, int columnNumber) {
         this.lineNumber = lineNumber;
@@ -8,15 +11,14 @@ public class Position implements IPosition {
     }
 
     public int getLineNumber() {
-        return lineNumber;
-    }
-    public int getColumnNumber() {
-        return columnNumber;
+        return this.lineNumber;
     }
 
-    public  String toString() {
-        return "(line "+lineNumber+", column "+columnNumber+")";
+    public int getColumnNumber() {
+        return this.columnNumber;
     }
-    private int lineNumber;
-    private int columnNumber;
+
+    public String toString() {
+        return "(line " + lineNumber + ", column " + columnNumber + ")";
+    }
 }

@@ -1,4 +1,6 @@
-import lexical.Lexical;
+import lexical.LexicalScanner;
+import lexical.token.Mnemonic;
+import lexical.token.Token;
 import utils.StringUtils;
 import utils.SymbolTable;
 
@@ -8,13 +10,13 @@ import java.util.LinkedList;
 
 public class CodeGenerator {
     private final LinkedList<LineStatement> intermediateRep = new LinkedList<>();
-    private final Lexical lexical;
-    private final SymbolTable<String, Integer> keyword;
+    private final LexicalScanner lexicalScanner;
+    private final SymbolTable<String, Token> keyword;
     // private final SymbolTable<??, ??> labels;  //future use in resolving labels during code generation
     private final String fileName;
 
-    public CodeGenerator(Lexical lexical, SymbolTable<String, Integer> keyword, String fileName) {
-        this.lexical = lexical;
+    public CodeGenerator(LexicalScanner lexicalScanner, SymbolTable<String, Token> keyword, String fileName) {
+        this.lexicalScanner = lexicalScanner;
         this.fileName = fileName;
         this.keyword = keyword;
     }
@@ -43,7 +45,10 @@ public class CodeGenerator {
             addr++;
 
             //Code
-            lst.append(StringUtils.getCustomFormat(4, StringUtils.getHexFromDecimal(keyword.get(ls.getMnemonic()), 2, false)));
+            Mnemonic mne = (Mnemonic) keyword.get(ls.getMnemonic().getName());
+            //Temp mne null check, will function much smarter later on
+
+            lst.append(StringUtils.getCustomFormat(4, StringUtils.getHexFromDecimal(mne == null ? -1 : mne.getOpCode(), 2, false)));
             //End Generating Opening of line statement
 
             lst.append(StringUtils.getCustomFormat(10, " ")); // Padding between Code and Mne
@@ -53,7 +58,7 @@ public class CodeGenerator {
 
             lst.append(StringUtils.getCustomFormat(9, " "));// Padding between Label and Mne
             //Mne
-            lst.append(StringUtils.getCustomFormat(6, ls.getMnemonic()));
+            lst.append(StringUtils.getCustomFormat(6, ls.getMnemonic().getName()));
             //Operand
             //Comments
             //End Generating Closing of line statement

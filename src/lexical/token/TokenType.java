@@ -1,4 +1,4 @@
-package lexical;
+package lexical.token;
 
 public enum TokenType {
     LABEL("Label"),
