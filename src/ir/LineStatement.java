@@ -1,3 +1,5 @@
+package ir;
+
 import lexical.token.Mnemonic;
 
 public class LineStatement {
@@ -23,7 +25,7 @@ public class LineStatement {
 
     @Override
     public String toString() {
-        return "LineStatement{" +
+        return "ir.LineStatement{" +
                 "mnemonic='" + mnemonic + '\'' +
                 '}';
     }

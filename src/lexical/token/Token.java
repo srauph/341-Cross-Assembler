@@ -35,7 +35,9 @@ public class Token implements IToken {
         return pos;
     }
 
-    public void setPosition(Position pos) { this.pos = pos; }
+    public void setPosition(Position pos) {
+        this.pos = pos;
+    }
 
     @Override
     public String toString() {

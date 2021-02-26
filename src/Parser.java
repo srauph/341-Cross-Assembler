@@ -1,14 +1,15 @@
+import ir.IntermediateRep;
+import ir.LineStatement;
 import lexical.LexicalScanner;
 import lexical.token.Mnemonic;
 import lexical.token.Token;
 import lexical.token.TokenType;
 import utils.SymbolTable;
 
-import java.util.LinkedList;
-
 public class Parser implements IParser {
     //Sequence of line statements
-    private final LinkedList<LineStatement> intermediateRep = new LinkedList<>();
+    private final IntermediateRep ir = new IntermediateRep();
+    // private final LinkedList<ir.LineStatement> intermediateRep = new LinkedList<>();
     private final LexicalScanner lexicalScanner;
     private final SymbolTable<String, Token> keywords;
     private Token nextToken;
@@ -35,7 +36,7 @@ public class Parser implements IParser {
               to be read
              */
             if (nextToken.getType() == TokenType.EOL) {
-                intermediateRep.add(ls);
+                ir.add(ls);
                 ls = new LineStatement();
             }
             // checks if the token is a valid mnemonic keyword
@@ -51,11 +52,11 @@ public class Parser implements IParser {
         //System.out.println(Arrays.toString(intermediateRep.toArray()));
     }
 
-    private void getNextToken() {
-        this.nextToken = lexicalScanner.getNextToken();
+    public IntermediateRep getIR() {
+        return this.ir;
     }
 
-    public LinkedList<LineStatement> getIR() {
-        return intermediateRep;
+    private void getNextToken() {
+        this.nextToken = lexicalScanner.getNextToken();
     }
 }

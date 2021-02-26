@@ -1,3 +1,5 @@
+import ir.IntermediateRep;
+import ir.LineStatement;
 import lexical.LexicalScanner;
 import lexical.token.Mnemonic;
 import lexical.token.Token;
@@ -6,23 +8,20 @@ import utils.SymbolTable;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.LinkedList;
 
 public class CodeGenerator {
-    private final LinkedList<LineStatement> intermediateRep = new LinkedList<>();
+    private final IntermediateRep ir;
     private final LexicalScanner lexicalScanner;
     private final SymbolTable<String, Token> keyword;
     // private final SymbolTable<??, ??> labels;  //future use in resolving labels during code generation
     private final String fileName;
 
-    public CodeGenerator(LexicalScanner lexicalScanner, SymbolTable<String, Token> keyword, String fileName) {
+    public CodeGenerator(LexicalScanner lexicalScanner, SymbolTable<String, Token> keyword, String fileName, IntermediateRep ir) {
         this.lexicalScanner = lexicalScanner;
         this.fileName = fileName;
         this.keyword = keyword;
-    }
-
-    public void copyIR(LinkedList<LineStatement> ir) {
-        this.intermediateRep.addAll(ir);
+        this.ir = new IntermediateRep();
+        this.ir.copyIR(ir);
     }
 
     public void generateListing() {
@@ -30,7 +29,7 @@ public class CodeGenerator {
         lst.append("Line Addr Code          Label         Mne   Operand       Comments\r\n");
         int linePosition = 1;
         int addr = 0;
-        for (LineStatement ls : intermediateRep) {
+        for (LineStatement ls : ir.getStatements()) {
             if (ls == null) {
                 //Error, should not have a null line statement though
                 continue;

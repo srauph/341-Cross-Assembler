@@ -1,7 +1,7 @@
-import java.util.LinkedList;
+import ir.IntermediateRep;
 
 public interface IParser {
     void parseTokens();
 
-    LinkedList<LineStatement> getIR();
+    IntermediateRep getIR();
 }

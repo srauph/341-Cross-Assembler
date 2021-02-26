@@ -2,23 +2,19 @@ import lexical.LexicalScanner;
 
 public class Main {
 
-
     public static void main(String[] args) {
-        //Temp way to get file  name, will eventually read from arguments
-        String inputFile = "TestInherentMnemonics.asm";
-        String fileName = inputFile.replace(".asm", "");
-
+        //Reads filename and arguments
+        Options options = new Options(args);
 
         //Will analyze the .asm for tokens
-        LexicalScanner lexicalScanner = new LexicalScanner(inputFile);
+        LexicalScanner lexicalScanner = new LexicalScanner(options.getInputFile());
 
         //Using the lexical analyzer, parse them to generate a line of statements
         Parser parser = new Parser(lexicalScanner, lexicalScanner.getKeywords());
         parser.parseTokens();
 
         //Copy over the (IR?) sequential list of line statements to be processed
-        CodeGenerator codeGen = new CodeGenerator(lexicalScanner, lexicalScanner.getKeywords(), fileName);
-        codeGen.copyIR(parser.getIR());
+        CodeGenerator codeGen = new CodeGenerator(lexicalScanner, lexicalScanner.getKeywords(), options.getFileName(), parser.getIR());
         codeGen.generateListing();
 
         System.out.println("Done creating TestInherentMnemonics.lst file.");

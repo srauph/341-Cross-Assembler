@@ -12,7 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class LexicalScanner {
+public class LexicalScanner implements ILexicalScanner {
 
     private int lineNumber = 1;
     private int columnNumber = 0;
@@ -37,7 +37,7 @@ public class LexicalScanner {
     /**
      * Initializes the keyword table to allow verification of valid mnemonics and directions (in the future).
      */
-    private void initKeywordTable() {
+    public void initKeywordTable() {
         keywords.put("halt", new Mnemonic("halt", 0x00));
         keywords.put("pop", new Mnemonic("pop", 0x01));
         keywords.put("dup", new Mnemonic("dup", 0x02));
