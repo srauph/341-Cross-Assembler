@@ -14,9 +14,10 @@ public class Main {
         parser.parseTokens();
 
         //Copy over the (IR?) sequential list of line statements to be processed
-        CodeGenerator codeGen = new CodeGenerator(lexicalScanner, lexicalScanner.getKeywords(), options.getFileName(), parser.getIR());
-        codeGen.generateListing();
+        //TODO: Uncomment after parser is fixed for sprint 3
+        //CodeGenerator codeGen = new CodeGenerator(lexicalScanner, lexicalScanner.getKeywords(), options.getFileName(), parser.getIR());
+        //codeGen.generateListing();
 
-        System.out.println("Done creating TestInherentMnemonics.lst file.");
+        System.out.println("Done creating TestImmediate.lst file.");
     }
 }

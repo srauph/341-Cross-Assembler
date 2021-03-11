@@ -1,32 +1,37 @@
 package ir;
 
-import lexical.token.Mnemonic;
+import lexical.token.Comment;
+import lexical.token.Instruction;
 
 public class LineStatement {
     //Label
-    private Mnemonic mnemonic;
-    //Operand
-    //Comment
+    private Instruction instruction;
+    private Comment comment;
 
     public LineStatement() {
     }
 
-    public LineStatement(Mnemonic mnemonic) {
-        this.mnemonic = mnemonic;
+    public Instruction getInstruction() {
+        return instruction;
     }
 
-    public Mnemonic getMnemonic() {
-        return mnemonic;
+    public void setInstruction(Instruction instruction) {
+        this.instruction = instruction;
     }
 
-    public void setMnemonic(Mnemonic mnemonic) {
-        this.mnemonic = mnemonic;
+    public Comment getComment() {
+        return comment;
+    }
+
+    public void setComment(Comment comment) {
+        this.comment = comment;
     }
 
     @Override
     public String toString() {
-        return "ir.LineStatement{" +
-                "mnemonic='" + mnemonic + '\'' +
+        return "LineStatement{" +
+                "instruction=" + instruction +
+                ", comment=" + comment +
                 '}';
     }
 }

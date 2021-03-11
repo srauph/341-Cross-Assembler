@@ -63,77 +63,126 @@ public class LexicalScanner implements ILexicalScanner {
         keywords.put("tgt", new Mnemonic("tgt", 0x1D));
         keywords.put("tle", new Mnemonic("tle", 0x1E));
         keywords.put("tge", new Mnemonic("tge", 0x1F));
+        keywords.put("enter.u5", new Mnemonic("enter.u5", 0x70));
+        keywords.put("ldc.i3", new Mnemonic("ldc.i3", 0x90));
+        keywords.put("addv.u3", new Mnemonic("addv.u3", 0x98));
+        keywords.put("ldv.u3", new Mnemonic("ldv.u3", 0xA0));
+        keywords.put("stv.u3", new Mnemonic("stv.u3", 0xA8));
         //Will add the rest when we get to there
     }
 
     /**
-     * Returns the next token. Currently only supports reading mnemonics, EOL, EOF.
-     * but will eventually support the rest.
-     * <p>
-     * For reference halt, and, nop, or, etc are utils.Mnemonics.
+     * Returns the next token. Supports Mnemonic of inherent/immediate types,
+     * instruction, comment, EOL and EOF.
      *
      * @return the next token
      */
     public Token getNextToken() {
-        String alphabet = "[a-zA-Z]*$";
         StringBuilder sb = new StringBuilder();
-        Mnemonic mne = null;
+        String alphabet = "[a-zA-Z]*$";
+        String numbers = "[0-9]*$";
+        int c = readChar();
+
+        //   System.out.println([DEBUG] c);
+
+        //skip ignored characters until we reach a valid character
+        while (StringUtils.isIgnoredCharacter(c)) {
+            c = readChar();
+        }
+        //label
+
+        //Mnemonic inherent/immediate
+        if (String.valueOf((char) c).matches(alphabet)) {
+            return readAddressing(c, sb);
+        }
+
+        //instruction
+        if (StringUtils.isMinusSign(c) || String.valueOf((char) c).matches(numbers)) {
+            return readInstruction(c, sb);
+        }
+
+        //comment
+        if (StringUtils.isSemicolon(c)) {
+            return readComment(c, sb);
+        }
+
+        //Check if next valid character is an EOL
+        if (StringUtils.isEOL(c)) {
+            return new Token(new Position(0, 0), "EOL", TokenType.EOL);
+        }
+
+        //Check EOF
+        if (c == 65535 || c == '\0') {
+            return new Token(new Position(0, 0), "EOF", TokenType.EOF);
+        }
+
+        //If it ever gets here, it should be reported as an error
+        return new Token(new Position(0, 0), "UNKNOWN", TokenType.UNKNOWN);
+    }
+
+    /**
+     * Returns the next available character.
+     *
+     * @return next character
+     */
+    private char readChar() {
         try {
-            int c;
-            //Read each character
-            while ((c = fis.read()) != -1) {
-                currentColumn++;
-                //If the character is a space, continue to next character
-                if (StringUtils.isSpace(c)) { // space
-                    columnNumber++;
-                    continue;
-                }
-                //If the character is a letter, we can assume it is a mnemonic (for now)
-                if (String.valueOf((char) c).matches(alphabet)) { // mnemonic
-                    //Append the character to start building the string
-                    sb.append((char) c);
-                    //If we're just starting to create the mnemonic, create the object
-                    if (mne == null) {
-                        mne = new Mnemonic();
-                    }
-                }
-                // If the current character is an EOL character, return an EOL token
-                if (StringUtils.isEOL(c)) {
-                    int EOLColumnNumber = currentColumn - 1;
-                    columnNumber = 0;
-                    currentColumn = 0;
-                    lineNumber++;
-                    return new Token(new Position(lineNumber - 1, EOLColumnNumber), "EOL", TokenType.EOL);
-                }
-                //Verify the string being built if it os a valid mne and break if so
-                //This functionality will change when having to support other types of tokens
-                if (keywords.containsKey(sb.toString())) {
-                    break;
-                }
-            }
-            //Outside the loop, if the string is empty, return an EOF, the file is done being read
-            if (sb.toString().equals("")) {
-                fis.close();
-                return new Token(new Position(lineNumber, currentColumn), "EOF", TokenType.EOF);
-            } else {
-                //Broken out of the while loop from finding a valid mnemonic
-                if (mne != null) {
-                    //Set its position, name and return it.
-                    mne.setPosition(new Position(lineNumber, columnNumber));
-                    mne.setName(sb.toString());
-                    columnNumber = currentColumn;
-                    return mne;
-                }
-            }
+            return (char) fis.read();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        try {
-            fis.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        return '\0';
+    }
+
+    /**
+     * Reads the .asm file for the next available mnemonic. It can be either immediate/inherent addressing.
+     *
+     * @param c
+     * @return mnemonic token
+     */
+    private Token readAddressing(int c, StringBuilder sb) {
+        while (!StringUtils.isSpace(c)) {
+            //continue reading each character
+            sb.append((char) c);
+            c = readChar();
         }
-        return new Token(new Position(lineNumber, columnNumber + 1), "EOF", TokenType.EOF);
+        return new Token(new Position(0, 0), sb.toString(), TokenType.MNEMONIC);
+    }
+
+    /**
+     * Returns the token of the instruction. Supports negative values.
+     *
+     * @param c
+     * @param sb
+     * @return instruction token
+     */
+    private Token readInstruction(int c, StringBuilder sb) {
+        while (!StringUtils.isSpace(c)) {
+            //continue reading each character
+            sb.append((char) c);
+            c = readChar();
+        }
+        return new Token(new Position(0, 0), sb.toString(), TokenType.INSTRUCTION);
+    }
+
+    /**
+     * Returns the comment token.
+     *
+     * @param c
+     * @param sb
+     * @return comment token
+     */
+    private Token readComment(int c, StringBuilder sb) {
+        while (!StringUtils.isEOL(c)) {
+            //continue reading each character
+            sb.append((char) c);
+            c = readChar();
+            //Don't include this return as part of the comment
+            if (c == '\r') {
+                break;
+            }
+        }
+        return new Token(new Position(0, 0), sb.toString(), TokenType.COMMENT);
     }
 
     public SymbolTable<String, Token> getKeywords() {

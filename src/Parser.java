@@ -1,7 +1,6 @@
 import ir.IntermediateRep;
 import ir.LineStatement;
 import lexical.LexicalScanner;
-import lexical.token.Mnemonic;
 import lexical.token.Token;
 import lexical.token.TokenType;
 import utils.SymbolTable;
@@ -23,6 +22,12 @@ public class Parser implements IParser {
     /**
      * Generates line statements based upon tokens from the lexical analyzer.
      * Currently supports only Mnemomics.
+     *
+     *
+     * Each LineStatement is composed of three optional parts (a label,
+     * an instruction/directive and a comment) followed by an end-of-line (EOL).
+     *
+     * LineStatement = [ Label ] [ Instruction | Directive ] [ Comment ] EOL .
      */
     public void parseTokens() {
         LineStatement ls = new LineStatement();
@@ -39,10 +44,12 @@ public class Parser implements IParser {
                 ir.add(ls);
                 ls = new LineStatement();
             }
-            // checks if the token is a valid mnemonic keyword
-            else if (keywords.containsKey(nextToken.getName())) {
-                ls.setMnemonic((Mnemonic) nextToken);
-            }
+            //TODO Check TokenType and create the new objects Instruction, Comment, etc
+            /*
+             example: if  tokentype == mnemonic, then start creating the Instruction object
+                      if it is a comment, make comment object etc
+                      Feel free to change this function if it makes it easier for you
+             */
 
             //Get the next token to process
             getNextToken();

@@ -22,7 +22,6 @@ public class Mnemonic extends Token {
         this.opCode = opCode;
     }
 
-
     public int getOpCode() {
         return opCode;
     }
@@ -43,7 +42,7 @@ public class Mnemonic extends Token {
     public String toString() {
         return "Mnemonic{" +
                 "opCode=" + opCode +
-                ", size=" + size +
+                ", name=" + getValue() +
                 '}';
     }
 }

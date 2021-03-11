@@ -3,7 +3,7 @@ package lexical.token;
 public class Token implements IToken {
 
     private Position pos;
-    private String name;
+    private String value;
     private TokenType type;
 
     public Token() {
@@ -11,16 +11,16 @@ public class Token implements IToken {
 
     public Token(Position pos, String name, TokenType type) {
         this.pos = pos;
-        this.name = name;
+        this.value = name;
         this.type = type;
     }
 
-    public String getName() {
-        return name;
+    public String getValue() {
+        return value;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public TokenType getType() {
@@ -43,7 +43,7 @@ public class Token implements IToken {
     public String toString() {
         return "Token{" +
                 "pos=" + pos +
-                ", value='" + name + '\'' +
+                ", value='" + value + '\'' +
                 ", type=" + type +
                 '}';
     }

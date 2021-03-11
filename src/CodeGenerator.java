@@ -44,7 +44,7 @@ public class CodeGenerator {
             addr++;
 
             //Code
-            Mnemonic mne = (Mnemonic) keyword.get(ls.getMnemonic().getName());
+            Mnemonic mne = (Mnemonic) keyword.get(ls.getInstruction().getMnemonic().getValue());
             //Temp mne null check, will function much smarter later on
 
             lst.append(StringUtils.getCustomFormat(4, StringUtils.getHexFromDecimal(mne == null ? -1 : mne.getOpCode(), 2, false)));
@@ -57,7 +57,7 @@ public class CodeGenerator {
 
             lst.append(StringUtils.getCustomFormat(9, " "));// Padding between Label and Mne
             //Mne
-            lst.append(StringUtils.getCustomFormat(6, ls.getMnemonic().getName()));
+            lst.append(StringUtils.getCustomFormat(6, ls.getInstruction().getMnemonic().getValue()));
             //Operand
             //Comments
             //End Generating Closing of line statement
