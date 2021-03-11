@@ -9,4 +9,5 @@ public interface ILexicalScanner {
     Token getNextToken();
 
     SymbolTable<String, Token> getKeywords();
+
 }

@@ -98,7 +98,7 @@ public class LexicalScanner implements ILexicalScanner {
 
         //instruction
         if (StringUtils.isMinusSign(c) || String.valueOf((char) c).matches(numbers)) {
-            return readInstruction(c, sb);
+            return readOperand(c, sb);
         }
 
         //comment
@@ -150,19 +150,20 @@ public class LexicalScanner implements ILexicalScanner {
     }
 
     /**
-     * Returns the token of the instruction. Supports negative values.
+     * Returns the token of the operand (?). Supports negative values.
+     * I am under the impression the operand is the number after the mnemonic and before the comment.
      *
      * @param c
      * @param sb
      * @return instruction token
      */
-    private Token readInstruction(int c, StringBuilder sb) {
+    private Token readOperand(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
             //continue reading each character
             sb.append((char) c);
             c = readChar();
         }
-        return new Token(new Position(0, 0), sb.toString(), TokenType.INSTRUCTION);
+        return new Token(new Position(0, 0), sb.toString(), TokenType.OPERAND);
     }
 
     /**

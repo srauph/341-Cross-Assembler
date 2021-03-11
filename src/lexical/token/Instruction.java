@@ -5,9 +5,8 @@ package lexical.token;
  */
 public class Instruction extends Token {
 
-
     private Mnemonic mnemonic;
-    //  private Operand operand; //TODO: Implement this
+    private Operand operand;
 
     public Instruction(Position pos, String name) {
         super(pos, name, TokenType.INSTRUCTION);
@@ -21,10 +20,19 @@ public class Instruction extends Token {
         this.mnemonic = mnemonic;
     }
 
+    public Operand getOperand() {
+        return operand;
+    }
+
+    public void setOperand(Operand operand) {
+        this.operand = operand;
+    }
+
     @Override
     public String toString() {
         return "Instruction{" +
                 "mnemonic=" + mnemonic +
+                ", operand=" + operand +
                 '}';
     }
 }
