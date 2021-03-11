@@ -25,7 +25,7 @@ through a custom cross-assembler for the Cm Assembly Language.
 - [ ] d) Keep track of the position (line, column) of the token.
 - [x] e) Skip white spaces.
 - [x] f) Scan comments.
-- [x] g) Scan identifiers (no labels yet, only mnemonics).
+- [x] g) Scan identifiers
 - [x] h) Scan numbers.
 - [ ] i) Report scanner errors.
 - [x] j) Return token to parser.
