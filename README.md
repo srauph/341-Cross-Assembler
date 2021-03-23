@@ -6,7 +6,7 @@ The project is about reading an .asm file and generating an .EXE
 through a custom cross-assembler for the Cm Assembly Language.
 
 
-## Product Backlog - Sprint # 2
+## Product Backlog - Sprint # 3
 - [x] Denotes the feature is supported in its current required standing
 - [ ] Not supported.
 
@@ -24,9 +24,9 @@ through a custom cross-assembler for the Cm Assembly Language.
 - [x] c) Read characters from the input stream.
 - [ ] d) Keep track of the position (line, column) of the token.
 - [x] e) Skip white spaces.
-- [ ] f) Scan comments.
-- [x] g) Scan identifiers (no labels yet, only mnemonics).
-- [ ] h) Scan numbers.
+- [x] f) Scan comments.
+- [x] g) Scan identifiers
+- [x] h) Scan numbers.
 - [ ] i) Report scanner errors.
 - [x] j) Return token to parser.
 ### 4. Parse tokens and generate an intermediate representation (IR).

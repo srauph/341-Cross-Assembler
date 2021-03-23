@@ -10,13 +10,16 @@ public class Main {
         LexicalScanner lexicalScanner = new LexicalScanner(options.getInputFile());
 
         //Using the lexical analyzer, parse them to generate a line of statements
-        Parser parser = new Parser(lexicalScanner, lexicalScanner.getKeywords());
+        ErrorReporter errorReporter = new ErrorReporter(options);
+        Parser parser = new Parser(lexicalScanner, lexicalScanner.getKeywords(), errorReporter);
         parser.parseTokens();
+        errorReporter.report();
 
         //Copy over the (IR?) sequential list of line statements to be processed
-        CodeGenerator codeGen = new CodeGenerator(lexicalScanner, lexicalScanner.getKeywords(), options.getFileName(), parser.getIR());
-        codeGen.generateListing();
+        //TODO: Uncomment after parser is fixed for sprint 3
+        //CodeGenerator codeGen = new CodeGenerator(lexicalScanner, lexicalScanner.getKeywords(), options.getFileName(), parser.getIR());
+        //codeGen.generateListing();
 
-        System.out.println("Done creating TestInherentMnemonics.lst file.");
+        System.out.println("Done creating TestImmediate.lst file.");
     }
 }

@@ -2,6 +2,9 @@ package utils;
 
 public class StringUtils {
 
+    public static boolean isIgnoredCharacter(int c) {
+        return c == 13 || isSpace(c);
+    }
 
     public static boolean isSpace(int c) {
         return c == 32;
@@ -17,5 +20,13 @@ public class StringUtils {
 
     public static String getCustomFormat(int number, Object str) {
         return String.format("%1$-" + number + "s", str.toString());
+    }
+
+    public static boolean isSemicolon(int c) {
+        return c == 59;
+    }
+
+    public static boolean isMinusSign(int c) {
+        return c == 45;
     }
 }

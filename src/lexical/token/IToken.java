@@ -3,7 +3,7 @@ package lexical.token;
 public interface IToken {
     Position getPosition();
 
-    String getName();
+    String getValue();
 
     TokenType getType();
 }
