@@ -53,14 +53,14 @@ public class Parser implements IParser {
                     System.out.println("[Debug] - " + ls);
                     //Error Reporting
                     if (ls.getInstruction()!=null){//if no instruction then we assume its a line with only a comment and ignore it
-                        if (keywords.get(ls.getInstruction().getMnemonic().getValue())==null){
+                        if (keywords.get(ls.getInstruction().getMnemonic().getValue())==null){ //If Mnemonic not found in symbol table, it is considered invalid
                             ErrorMsg e1 = new ErrorMsg("Invalid mnemonic or directive.",nextToken.getPosition());
                             errorReporter.record(e1);
-                        } else if (keywords.get(ls.getInstruction().getMnemonic().getValue())!=null){
-                            if (!keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() == null){
+                        } else if (keywords.get(ls.getInstruction().getMnemonic().getValue())!=null){ 
+                            if (!keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() == null){ //If instruction in not inherent (immediate or relative) but does not have an operand
                                 ErrorMsg e2 = new ErrorMsg("Instruction requires an operand.",nextToken.getPosition());
                                 errorReporter.record(e2);
-                            }else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null){
+                            }else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null){ //If instruction is inherent but contains an operand
                                 ErrorMsg e3 = new ErrorMsg("Inherent instruction must not have an operand.",nextToken.getPosition());
                                 errorReporter.record(e3);
                             }
