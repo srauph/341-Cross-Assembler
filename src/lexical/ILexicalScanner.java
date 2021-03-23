@@ -1,5 +1,6 @@
 package lexical;
 
+import lexical.token.Mnemonic;
 import lexical.token.Token;
 import utils.SymbolTable;
 
@@ -8,5 +9,6 @@ public interface ILexicalScanner {
 
     Token getNextToken();
 
-    SymbolTable<String, Token> getKeywords();
+    SymbolTable<String, Mnemonic> getKeywords();
+
 }

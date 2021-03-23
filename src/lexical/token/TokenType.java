@@ -9,6 +9,7 @@ public enum TokenType {
     COMMENT("Comment"),
     EOL("EOL"),
     EOF("EOF"),
+    UNKNOWN("UNKNOWN"),
     ;
     private final String type;
 

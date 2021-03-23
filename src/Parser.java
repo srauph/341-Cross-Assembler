@@ -73,7 +73,6 @@ public class Parser implements IParser {
                     break;
 
                 case MNEMONIC:          //If token is a mnemonic
-
                     ls.setInstruction(new Instruction(position, value)); // Set instruction
                     //Set newly created instruction's mnemonic
                     ls.getInstruction().setMnemonic(new Mnemonic(position, value));
@@ -95,9 +94,8 @@ public class Parser implements IParser {
 
             }
 
-            System.out.println(nextToken);
             //Get the next token to process
-
+            //System.out.println(nextToken);
             getNextToken();
 
         }

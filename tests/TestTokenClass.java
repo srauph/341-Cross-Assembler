@@ -11,19 +11,19 @@ public class TestTokenClass {
     Token t3 = new Token(new Position(3,6),"dup", TokenType.MNEMONIC);
     @Test
     void Should_Create_Halt_1_2_EqualTo_Mnemonic() {
-        String result = t1.getName()+"("+t1.getPosition().getLineNumber()+","+t1.getPosition().getColumnNumber()+")="+TokenType.MNEMONIC;
+        String result = t1.getValue()+"("+t1.getPosition().getLineNumber()+","+t1.getPosition().getColumnNumber()+")="+TokenType.MNEMONIC;
         Assertions.assertEquals("halt(1,2)=MNEMONIC",result);
     }
 
     @Test
     void Should_Create_Pop_2_4_EqualTo_Mnemonic() {
-        String result = t2.getName()+"("+t2.getPosition().getLineNumber()+","+t2.getPosition().getColumnNumber()+")="+TokenType.MNEMONIC;
+        String result = t2.getValue()+"("+t2.getPosition().getLineNumber()+","+t2.getPosition().getColumnNumber()+")="+TokenType.MNEMONIC;
         Assertions.assertEquals("pop(2,4)=MNEMONIC",result);
     }
 
     @Test
     void Should_Create_Dup_3_6_EqualTo_Mnemonic() {
-        String result = t3.getName()+"("+t3.getPosition().getLineNumber()+","+t3.getPosition().getColumnNumber()+")="+TokenType.MNEMONIC;
+        String result = t3.getValue()+"("+t3.getPosition().getLineNumber()+","+t3.getPosition().getColumnNumber()+")="+TokenType.MNEMONIC;
         Assertions.assertEquals("dup(3,6)=MNEMONIC",result);
     }
 }
