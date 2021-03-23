@@ -24,7 +24,7 @@ public class ErrorReporter implements IErrorReporter{
 				System.out.print(fileName + ": Error: Line: " + list.get(errorCount).getPosition().getLineNumber() + ": " + list.get(errorCount).getMessage() + "\n");
 				errorCount++;
 			}
-			System.out.print("\n" + errorCount + "errors.");
+			System.out.print("\n" + errorCount + " errors.");
 			System.exit(1);
 		}
 	}
