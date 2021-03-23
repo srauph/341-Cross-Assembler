@@ -3,6 +3,7 @@ package lexical.token;
 public class Mnemonic extends Token {
     private int opCode; // value of opcode
     private int size; // size of opcode
+    private String mode; //inherent or immediate;
 
     public Mnemonic() {
     }
@@ -17,9 +18,10 @@ public class Mnemonic extends Token {
         super(pos, value, TokenType.MNEMONIC);
     }
 
-    public Mnemonic(String value, int opCode) {
+    public Mnemonic(String value, int opCode, String mode) {
         super(null, value, TokenType.MNEMONIC);
         this.opCode = opCode;
+        this.mode = mode;
     }
 
     public int getOpCode() {
@@ -36,6 +38,10 @@ public class Mnemonic extends Token {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public String getMode(){
+        return mode;
     }
 
     @Override
