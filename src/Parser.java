@@ -4,9 +4,6 @@ import lexical.LexicalScanner;
 import lexical.token.*;
 import utils.SymbolTable;
 
-import javax.sound.midi.Soundbank;
-import java.sql.SQLOutput;
-
 public class Parser implements IParser {
     //Sequence of line statements
     private final IntermediateRep ir = new IntermediateRep();
@@ -54,36 +51,21 @@ public class Parser implements IParser {
 
                 case EOL:               //If token is EOL, LS is finished, add it to IR and start a new one.
                     System.out.println("[Debug] - " + ls);
-
-                    if(ls.getInstruction() != null) {
-                        if(ls.getInstruction().getOperand() == null) {
-                            ls.getInstruction().getMnemonic().setMode("inherent");
-                        }
-                    }
-
                     //Error Reporting
-                    System.out.println("Line statement - " + ls.getInstruction());
-
                     if (ls.getInstruction()!=null){//if no instruction then we assume its a line with only a comment and ignore it
-                        System.out.println("NOT NULL");
-                        if (keywords.get(ls.getInstruction().getMnemonic().getValue())==null){
-                            System.out.println("[EOL] INVALID MNEMONIC OR DIRECTIVE - " + keywords.get(ls.getInstruction().getMnemonic().getValue()));
-                            ErrorMsg invalid_mnemonic_or_directive = new ErrorMsg("Invalid mnemonic or directive.",nextToken.getPosition());
-                            errorReporter.record(invalid_mnemonic_or_directive);
-                        } else if (keywords.get(ls.getInstruction().getMnemonic().getValue())!=null){
-                            if (!keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() == null){
-                                System.out.println("[EOL] INSTRUCTION REQUIRES AN OPERAND - " + keywords.get(ls.getInstruction().getMnemonic().getValue()));
-                                ErrorMsg instruction_no_operand = new ErrorMsg("Instruction requires an operand.",nextToken.getPosition());
-                                errorReporter.record(instruction_no_operand);
-                            }else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null){
-                                System.out.println("[EOL] INHERENT INSTRUCTION MUST NOT HAVE AN OPERAND - " + keywords.get(ls.getInstruction().getMnemonic().getValue()));
-                                ErrorMsg inherent_instruction_with_operand = new ErrorMsg("Inherent instruction must not have an operand.",nextToken.getPosition());
-                                errorReporter.record(inherent_instruction_with_operand);
+                        if (keywords.get(ls.getInstruction().getMnemonic().getValue())==null){ //If Mnemonic not found in symbol table, it is considered invalid
+                            ErrorMsg e1 = new ErrorMsg("Invalid mnemonic or directive.",nextToken.getPosition());
+                            errorReporter.record(e1);
+                        } else if (keywords.get(ls.getInstruction().getMnemonic().getValue())!=null){ 
+                            if (!keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() == null){ //If instruction in not inherent (immediate or relative) but does not have an operand
+                                ErrorMsg e2 = new ErrorMsg("Instruction requires an operand.",nextToken.getPosition());
+                                errorReporter.record(e2);
+                            }else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null){ //If instruction is inherent but contains an operand
+                                ErrorMsg e3 = new ErrorMsg("Inherent instruction must not have an operand.",nextToken.getPosition());
+                                errorReporter.record(e3);
                             }
                         }
-                        break;
                     }
-
                     ir.add(ls);
                     ls = new LineStatement();
                     break;
@@ -93,77 +75,23 @@ public class Parser implements IParser {
                     break;
 
                 case MNEMONIC:          //If token is a mnemonic
-
-                    /*
-                    //Error Reporting
-                    if (ls.getInstruction()!=null){//if no instruction then we assume its a line with only a comment and ignore it
-                        if (keywords.get(ls.getInstruction().getMnemonic().getValue())==null){
-                            System.out.println("[MNEMONIC] INVALID MNEMONIC OR DIRECTIVE - " + keywords.get(ls.getInstruction().getMnemonic().getValue()));
-                            ErrorMsg invalid_mnemonic_or_directive = new ErrorMsg("Invalid mnemonic or directive.",nextToken.getPosition());
-                            errorReporter.record(invalid_mnemonic_or_directive);
-                        } else if (keywords.get(ls.getInstruction().getMnemonic().getValue())!=null){
-                            if (!keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() == null){
-                                System.out.println("[MNEMONIC] INSTRUCTION REQUIRES AN OPERAND - " + keywords.get(ls.getInstruction().getMnemonic().getValue()));
-                                ErrorMsg instruction_no_operand = new ErrorMsg("Instruction requires an operand.",nextToken.getPosition());
-                                errorReporter.record(instruction_no_operand);
-                            }else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null){
-                                System.out.println("[MNEMONIC] INHERENT INSTRUCTION MUST NOT HAVE AN OPERAND - " + keywords.get(ls.getInstruction().getMnemonic().getValue()));
-                                ErrorMsg inherent_instruction_with_operand = new ErrorMsg("Inherent instruction must not have an operand.",nextToken.getPosition());
-                                errorReporter.record(inherent_instruction_with_operand);
-                            }
-                        }
-                        break;
-                    }
-
-                     */
-
                     ls.setInstruction(new Instruction(position, value)); // Set instruction
                     //Set newly created instruction's mnemonic
                     ls.getInstruction().setMnemonic(new Mnemonic(position, value));
                     break;
 
                 case OPERAND:
-                    /*
-                    //Error Reporting
-                    if (ls.getInstruction()!=null){//if no instruction then we assume its a line with only a comment and ignore it
-                        if (keywords.get(ls.getInstruction().getMnemonic().getValue())==null){
-                            System.out.println("[OPERAND] INVALID MNEMONIC OR DIRECTIVE - " + keywords.get(ls.getInstruction().getMnemonic().getValue()));
-                            ErrorMsg invalid_mnemonic_or_directive = new ErrorMsg("Invalid mnemonic or directive.",nextToken.getPosition());
-                            errorReporter.record(invalid_mnemonic_or_directive);
-                        } else if (keywords.get(ls.getInstruction().getMnemonic().getValue())!=null){
-                            if (!keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() == null){
-                                System.out.println("[OPERAND] INSTRUCTION REQUIRES AN OPERAND - " + keywords.get(ls.getInstruction().getMnemonic().getValue()));
-                                ErrorMsg instruction_no_operand = new ErrorMsg("Instruction requires an operand.",nextToken.getPosition());
-                                errorReporter.record(instruction_no_operand);
-                            }else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null){
-                                System.out.println("[OPERAND] INHERENT INSTRUCTION MUST NOT HAVE AN OPERAND - " + keywords.get(ls.getInstruction().getMnemonic().getValue()));
-                                ErrorMsg inherent_instruction_with_operand = new ErrorMsg("Inherent instruction must not have an operand.",nextToken.getPosition());
-                                errorReporter.record(inherent_instruction_with_operand);
-                            }
-                        }
-                        break;
-                    }
-
-                     */
-
                     //System.out.println("[Debug] - " + nextToken);
                     ls.getInstruction().getMnemonic().setOpCode(Integer.parseInt(value)); //Set mnemonic's opcode
                     Operand operand = new Operand(position, value);
                     operand.setOperand(Integer.parseInt(value));
                     ls.getInstruction().setOperand(operand); //set instruction's opcode
-                    ls.getInstruction().getMnemonic().setMode("immediate");
                     break;
-
-                case UNKNOWN:   // Unknown token
-                    ErrorMsg unknown_token = new ErrorMsg("Unknown token", nextToken.getPosition());
-                    errorReporter.record(unknown_token);
 
             }
 
             //Get the next token to process
-            System.out.println(nextToken);
             getNextToken();
-
         }
 //        System.out.println("[Debug]" + this.nextToken);
         //System.out.println("[Debug] Done parsing tokens...");
