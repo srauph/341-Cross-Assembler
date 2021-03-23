@@ -1,5 +1,6 @@
 package ir;
 
+import lexical.token.Position;
 import lexical.token.Comment;
 import lexical.token.Instruction;
 
