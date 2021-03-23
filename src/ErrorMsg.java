@@ -1,21 +1,32 @@
 import lexical.token.Position;
 
-public class ErrorMsg{
+public class ErrorMsg {
 
-	String msg;
-	Position pos;
+    String msg;
+    Position pos;
 
-	public ErrorMsg(String message, Position position){
-		this.msg = message;
-		this.pos = position;
-	}
+    public ErrorMsg() {
+    	this.msg = "";
+    	this.pos = null;
+    }
 
-	public String getMessage(){
+    public ErrorMsg(String message, Position position) {
+        this.msg = message;
+        this.pos = position;
+    }
+	public String getMessage() {
 		return msg;
 	}
 
-	public Position getPosition(){
+	public void setMessage(String msg) {
+		this.msg = msg;
+	}
+
+	public Position getPosition() {
 		return pos;
 	}
 
+	public void setPosition(Position pos) {
+		this.pos = pos;
+	}
 }

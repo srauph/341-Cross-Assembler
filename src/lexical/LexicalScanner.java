@@ -117,7 +117,6 @@ public class LexicalScanner implements ILexicalScanner {
             return new Token(new Position(0, 0), "EOF", TokenType.EOF);
         }
 
-        //If it ever gets here, it should be reported as an error
         return readUnknown(c, sb);
     }
 

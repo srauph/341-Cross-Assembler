@@ -1,7 +1,5 @@
 ; TestImmediate.asm - Test immediate instructions.
-ldc.i3         ; An immediate instruction always requires an operand.
-  pop      2     ; An inherent instruction has no operand.
-  top            ; Not a valid mnemonic or directive.
+
           enter.u5  0        ; OK, number <u5> [0..31].
           enter.u5  1        ; OK, number <u5> [0..31].
           enter.u5  2        ; OK, number <u5> [0..31].
