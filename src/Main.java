@@ -10,8 +10,10 @@ public class Main {
         LexicalScanner lexicalScanner = new LexicalScanner(options.getInputFile());
 
         //Using the lexical analyzer, parse them to generate a line of statements
-        Parser parser = new Parser(lexicalScanner, lexicalScanner.getKeywords());
+        ErrorReporter errorReporter = new ErrorReporter();
+        Parser parser = new Parser(lexicalScanner, lexicalScanner.getKeywords(), errorReporter);
         parser.parseTokens();
+        errorReporter.report();
 
         //Copy over the (IR?) sequential list of line statements to be processed
         //TODO: Uncomment after parser is fixed for sprint 3

@@ -9,13 +9,15 @@ public class Parser implements IParser {
     private final IntermediateRep ir = new IntermediateRep();
     // private final LinkedList<ir.LineStatement> intermediateRep = new LinkedList<>();
     private final LexicalScanner lexicalScanner;
-    private final SymbolTable<String, Token> keywords;
+    private final SymbolTable<String, Mnemonic> keywords;
     private Token nextToken;
+    private IErrorReporter errorReporter;
 
-    public Parser(LexicalScanner lexicalScanner, SymbolTable<String, Token> keywords) {
+    public Parser(LexicalScanner lexicalScanner, SymbolTable<String, Mnemonic> keywords, IErrorReporter errorRep) {
         this.lexicalScanner = lexicalScanner;
         this.keywords = keywords;
         this.nextToken = lexicalScanner.getNextToken();
+        this.errorReporter = errorRep;
     }
 
     /**
@@ -49,6 +51,21 @@ public class Parser implements IParser {
 
                 case EOL:               //If token is EOL, LS is finished, add it to IR and start a new one.
                     System.out.println("[Debug] - " + ls);
+                    //Error Reporting
+                    if (ls.getInstruction()!=null){//if no instruction then we assume its a line with only a comment and ignore it
+                        if (keywords.get(ls.getInstruction().getMnemonic().getValue())==null){
+                            ErrorMsg e1 = new ErrorMsg("Invalid mnemonic or directive.",nextToken.getPosition());
+                            errorReporter.record(e1);
+                        } else if (keywords.get(ls.getInstruction().getMnemonic().getValue())!=null){
+                            if (!keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() == null){
+                                ErrorMsg e2 = new ErrorMsg("Instruction requires an operand.",nextToken.getPosition());
+                                errorReporter.record(e2);
+                            }else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null){
+                                ErrorMsg e3 = new ErrorMsg("Inherent instruction must not have an operand.",nextToken.getPosition());
+                                errorReporter.record(e3);
+                            }
+                        }
+                    }
                     ir.add(ls);
                     ls = new LineStatement();
                     break;
