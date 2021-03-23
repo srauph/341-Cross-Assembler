@@ -44,6 +44,10 @@ public class Mnemonic extends Token {
         return mode;
     }
 
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
     @Override
     public String toString() {
         return "Mnemonic{" +

@@ -83,7 +83,8 @@ public class LexicalScanner implements ILexicalScanner {
         String numbers = "[0-9]*$";
         int c = readChar();
 
-        //   System.out.println([DEBUG] c);
+        System.out.println("[DEBUG]" + c);
+
 
         //skip ignored characters until we reach a valid character
         while (StringUtils.isIgnoredCharacter(c)) {
@@ -117,7 +118,22 @@ public class LexicalScanner implements ILexicalScanner {
         }
 
         //If it ever gets here, it should be reported as an error
-        return new Token(new Position(0, 0), "UNKNOWN", TokenType.UNKNOWN);
+        return readUnknown(c, sb);
+    }
+
+    /**
+     * Reads the .asm file for the next unknown token.
+     *
+     * @param c
+     * @return unknown token
+     */
+    private Token readUnknown(int c, StringBuilder sb) {
+        while (!StringUtils.isSpace(c)) {
+            //continue reading each character
+            sb.append((char) c);
+            c = readChar();
+        }
+        return new Token(new Position(0, 0), sb.toString(), TokenType.UNKNOWN);
     }
 
     /**

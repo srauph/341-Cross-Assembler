@@ -10,7 +10,7 @@ public class Main {
         LexicalScanner lexicalScanner = new LexicalScanner(options.getInputFile());
 
         //Using the lexical analyzer, parse them to generate a line of statements
-        ErrorReporter errorReporter = new ErrorReporter();
+        ErrorReporter errorReporter = new ErrorReporter(options);
         Parser parser = new Parser(lexicalScanner, lexicalScanner.getKeywords(), errorReporter);
         parser.parseTokens();
         errorReporter.report();

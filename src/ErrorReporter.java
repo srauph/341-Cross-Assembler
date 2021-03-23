@@ -4,10 +4,12 @@ public class ErrorReporter implements IErrorReporter{
 
 	LinkedList<ErrorMsg> list;
 	boolean errorsReported;
+	String fileName;
 
-	public ErrorReporter(){
+	public ErrorReporter(Options options){
 		list = new LinkedList<ErrorMsg>();
 		errorsReported = false;
+		fileName = options.getFileName() + ".asm";
 	}
 
 	public void record(ErrorMsg error){
@@ -17,12 +19,12 @@ public class ErrorReporter implements IErrorReporter{
 	
 	public void report(){
 		if (this.errorsReported){
-			int i = 0;
-			while (i<list.size()){
-				System.out.print("Error at line " + list.get(i).getPosition().getLineNumber() + ": " + list.get(i).getMessage() + "\n");
-				i++;
+			int errorCount = 0;
+			while (errorCount<list.size()){
+				System.out.print(fileName + ": Error: Line: " + list.get(errorCount).getPosition().getLineNumber() + ": " + list.get(errorCount).getMessage() + "\n");
+				errorCount++;
 			}
-			System.out.print("\nErrors: " + i + "\n");
+			System.out.print("\n" + errorCount + "errors.");
 			System.exit(1);
 		}
 	}
