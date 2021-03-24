@@ -31,4 +31,9 @@ public class ErrorMsg {
 	public void setPosition(Position pos) {
 		this.pos = pos;
 	}
+
+	public String toString(){
+		return "Error message - " + getMessage()
+		+ ". position - " + getPosition();
+	}
 }

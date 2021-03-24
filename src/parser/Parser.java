@@ -116,6 +116,8 @@ public class Parser implements IParser {
                     errorMsg.setMessage("Instruction requires an operand.");
                 } else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null) { //If instruction is inherent but contains an operand
                     errorMsg.setMessage("Inherent instruction must not have an operand.");
+                } else if(!getSuffix(keywords.get(ls.getInstruction().getMnemonic().getValue()).getValue()).isEmpty()){
+                    errorMsg.setMessage(isValidOperand(ls));
                 }
             }
             if (!errorMsg.getMessage().isEmpty()) {
@@ -125,19 +127,36 @@ public class Parser implements IParser {
         }
     }
 
-//    private boolean isValidOperand(LineStatement ls) {
-//        String suffix = getSuffix(ls.getInstruction().getValue());
-//        int opCode = Integer.parseInt(ls.getInstruction().getOperand().getValue());
-//
-//        switch(suffix) {
-//            case "i3":
-//                if(opCode < 0 || opCode > 31) {
-//
-//                }
-//        }
-//
-//    }
+    private String isValidOperand(LineStatement ls) {
+        String errorMessage = "";
+        String suffix = getSuffix(ls.getInstruction().getValue());
+        int opCode = Integer.parseInt(ls.getInstruction().getOperand().getValue());
+        String mnemonic = ls.getInstruction().getMnemonic().getValue();
 
+        if(suffix != null) {
+            switch (suffix) {
+                case "u5":
+                    if (opCode < 0 || opCode > 31) {
+                        errorMessage = "The immediate instruction \'" + mnemonic +
+                                "\' must have a 5-bit unsigned operand number ranging from 0 to 31.";
+                    }
+                    break;
+                case "u3":
+                    if (opCode < 0 || opCode > 7){
+                        errorMessage = "The immediate instruction \'" + mnemonic +
+                                "\' must have a 3-bit unsigned operand number ranging from 0 to 7.";
+                    }
+                    break;
+                case "i3":
+                    if (opCode < -4 || opCode > 3){
+                        errorMessage = "The immediate instruction \'" + mnemonic +
+                                "\' must have a 3-bit unsigned operand number ranging from -4 to 3.";
+                    }
+                    break;
+            }
+        }
+        return errorMessage;
+    }
 
 
     /**
@@ -148,7 +167,9 @@ public class Parser implements IParser {
      */
     private String getSuffix(String value) {
         String[] opCode = value.split(".");
-        return opCode[opCode.length - 1];
+        if(opCode.length == 0) {
+            return "";
+        } else return opCode[opCode.length - 1];
     }
 
     private void getNextToken() {
