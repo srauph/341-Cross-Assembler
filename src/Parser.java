@@ -32,20 +32,13 @@ public class Parser implements IParser {
      */
     public void parseTokens() {
         LineStatement ls = new LineStatement();
-        // System.out.println("[Debug] Parsing tokens...");
         while (nextToken.getType() != TokenType.EOF) {
-//            System.out.println("[Debug]" + this.nextToken);
-            // System.out.println("[Debug] Parsing Token " + nextToken.toString());
-
             TokenType type = nextToken.getType();
             Position position = nextToken.getPosition();
             String value = nextToken.getValue();
 
             switch (type) {
-
                 case EOL:               //If token is EOL, LS is finished, add it to IR and start a new one.
-                    //System.out.println("[Debug] - " + ls);
-
                     if (ls.getInstruction() != null) {
                         if (ls.getInstruction().getOperand() == null) {
                             ls.getInstruction().getMnemonic().setMode("inherent");
@@ -54,23 +47,29 @@ public class Parser implements IParser {
 
                     //Error Reporting
                     errorReporting(ls);
-                    //System.out.println("[Debug] - Line statement - " + ls.getInstruction());
+
                     ir.add(ls);
                     ls = new LineStatement();
                     break;
-
+                case DIRECTIVE:
+                    Directive dr = new Directive(position, value);
+                    dr.setStringOperand(value);
+                    ls.setDirective(dr);
+                    break;
+                case STRING_OPERAND:
+                    if (ls.getDirective() != null) {
+                        ls.getDirective().setStringOperand(value);
+                    }
+                    break;
                 case COMMENT:           // If token is a comment
                     ls.setComment(new Comment(position, value));
                     break;
-
                 case MNEMONIC:          //If token is a mnemonic
                     ls.setInstruction(new Instruction(position, value)); // Set instruction
                     //Set newly created instruction's mnemonic
                     ls.getInstruction().setMnemonic(new Mnemonic(position, value));
                     break;
-
                 case OPERAND:
-
                     //System.out.println("[Debug] - " + nextToken);
                     ls.getInstruction().getMnemonic().setOpCode(Integer.parseInt(value)); //Set mnemonic's opcode
                     Operand operand = new Operand(position, value);
@@ -78,21 +77,13 @@ public class Parser implements IParser {
                     ls.getInstruction().setOperand(operand); //set instruction's opcode
                     ls.getInstruction().getMnemonic().setMode("immediate");
                     break;
-
-                case UNKNOWN:   // Unknown token
+                default:
                     ErrorMsg unknown_token = new ErrorMsg("Unknown token", nextToken.getPosition());
                     errorReporter.record(unknown_token);
-
             }
-
             //Get the next token to process
-            //System.out.println(nextToken);
             getNextToken();
-
         }
-//        System.out.println("[Debug]" + this.nextToken);
-        //System.out.println("[Debug] Done parsing tokens...");
-        //System.out.println(Arrays.toString(intermediateRep.toArray()));
     }
 
     public IntermediateRep getIR() {

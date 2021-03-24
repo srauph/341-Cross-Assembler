@@ -92,6 +92,11 @@ public class LexicalScanner implements ILexicalScanner {
         }
         //label
 
+        //Directive
+        if (StringUtils.isPeriod((char) c)) {
+            return readDirective(c, sb);
+        }
+
         //Mnemonic inherent/immediate
         if (String.valueOf((char) c).matches(alphabet)) {
             return readAddressing(c, sb);
@@ -102,6 +107,11 @@ public class LexicalScanner implements ILexicalScanner {
             return readOperand(c, sb);
         }
 
+        //String for directive
+        if (StringUtils.isQuote((char) c)) {
+            return readStringOperand(c, sb);
+        }
+
         //comment
         if (StringUtils.isSemicolon(c)) {
             return readComment(c, sb);
@@ -109,15 +119,48 @@ public class LexicalScanner implements ILexicalScanner {
 
         //Check if next valid character is an EOL
         if (StringUtils.isEOL(c)) {
-            return new Token(new Position(0, 0), "EOL", TokenType.EOL);
+            Position pos = new Position(lineNumber, ++columnNumber);
+            this.columnNumber = 0;
+            ++lineNumber;//Increment after
+            return new Token(pos, "EOL", TokenType.EOL);
         }
 
         //Check EOF
         if (c == 65535 || c == '\0') {
-            return new Token(new Position(0, 0), "EOF", TokenType.EOF);
+            return new Token(new Position(lineNumber, 0), "EOF", TokenType.EOF);
         }
 
         return readUnknown(c, sb);
+    }
+
+    /**
+     * Reads string for directive.
+     *
+     * @param c
+     * @return unknown token
+     */
+    private Token readStringOperand(int c, StringBuilder sb) {
+        while (!StringUtils.isSpace(c)) {
+            //continue reading each character
+            sb.append((char) c);
+            c = readChar();
+        }
+        return new Token(new Position(lineNumber, ++columnNumber), sb.toString(), TokenType.STRING_OPERAND);
+    }
+
+    /**
+     * Reads directive.
+     *
+     * @param c
+     * @return unknown token
+     */
+    private Token readDirective(int c, StringBuilder sb) {
+        while (!StringUtils.isSpace(c)) {
+            //continue reading each character
+            sb.append((char) c);
+            c = readChar();
+        }
+        return new Token(new Position(lineNumber, ++columnNumber), sb.toString(), TokenType.DIRECTIVE);
     }
 
     /**
@@ -132,7 +175,7 @@ public class LexicalScanner implements ILexicalScanner {
             sb.append((char) c);
             c = readChar();
         }
-        return new Token(new Position(0, 0), sb.toString(), TokenType.UNKNOWN);
+        return new Token(new Position(lineNumber, ++columnNumber), sb.toString(), TokenType.UNKNOWN);
     }
 
     /**
@@ -161,7 +204,7 @@ public class LexicalScanner implements ILexicalScanner {
             sb.append((char) c);
             c = readChar();
         }
-        return new Token(new Position(0, 0), sb.toString(), TokenType.MNEMONIC);
+        return new Token(new Position(lineNumber, ++columnNumber), sb.toString(), TokenType.MNEMONIC);
     }
 
     /**
@@ -178,7 +221,7 @@ public class LexicalScanner implements ILexicalScanner {
             sb.append((char) c);
             c = readChar();
         }
-        return new Token(new Position(0, 0), sb.toString(), TokenType.OPERAND);
+        return new Token(new Position(lineNumber, ++columnNumber), sb.toString(), TokenType.OPERAND);
     }
 
     /**
@@ -198,7 +241,7 @@ public class LexicalScanner implements ILexicalScanner {
                 break;
             }
         }
-        return new Token(new Position(0, 0), sb.toString(), TokenType.COMMENT);
+        return new Token(new Position(lineNumber, ++columnNumber), sb.toString(), TokenType.COMMENT);
     }
 
     public SymbolTable<String, Mnemonic> getKeywords() {
