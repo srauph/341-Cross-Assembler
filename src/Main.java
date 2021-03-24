@@ -19,7 +19,7 @@ public class Main {
 
         Parser parser = new Parser(lexicalScanner, lexicalScanner.getKeywords(), errorReporter);
         parser.parseTokens();
-//        errorReporter.report();
+        errorReporter.report();
 
         //Copy over the (IR?) sequential list of line statements to be processed
         //TODO: Uncomment after parser is fixed for sprint 3

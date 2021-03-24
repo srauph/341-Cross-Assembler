@@ -24,7 +24,6 @@ public class ErrorReporter implements IErrorReporter{
 	public void record(ErrorMsg error){
 		this.list.add(error);
 		this.errorsReported = true;
-		report();
 	}
 	
 	public void report(){
