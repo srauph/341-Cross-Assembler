@@ -79,7 +79,7 @@ public class Parser implements IParser {
                     // Chunky: TLDR: base from keywords + operand + offset if negative = opcode
                     Mnemonic mne = ls.getInstruction().getMnemonic();
                     int opc = Integer.parseInt(value);
-                    System.out.println(opc);
+//                    System.out.println(opc);
                     switch (mne.getValue().split("\\.")[1]) {
                         case "u3":
                             opc -= 4;
