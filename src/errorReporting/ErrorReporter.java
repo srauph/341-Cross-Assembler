@@ -24,6 +24,7 @@ public class ErrorReporter implements IErrorReporter{
 	public void record(ErrorMsg error){
 		this.list.add(error);
 		this.errorsReported = true;
+		report();
 	}
 	
 	public void report(){
@@ -33,8 +34,8 @@ public class ErrorReporter implements IErrorReporter{
 				System.out.print(fileName + ": Error: Line: " + list.get(errorCount).getPosition().getLineNumber() + ": " + list.get(errorCount).getMessage() + "\n");
 				errorCount++;
 			}
-			System.out.print("\n" + errorCount + " errors.");
-			System.exit(1);
+			System.out.print(errorCount + " errors.\n");
+//			System.exit(1);
 		}
 	}
 

@@ -147,7 +147,9 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readStringOperand(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
-            errorReporting(c);
+            if (errorReporting(c)) {
+                return null;
+            }
             //continue reading each character
             sb.append((char) c);
             c = readChar();
@@ -163,7 +165,9 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readDirective(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
-            errorReporting(c);
+            if (errorReporting(c)) {
+                return null;
+            }
             //continue reading each character
             sb.append((char) c);
             c = readChar();
@@ -208,7 +212,9 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readAddressing(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
-            errorReporting(c);
+            if (errorReporting(c)) {
+                return null;
+            }
             //continue reading each character
             sb.append((char) c);
             c = readChar();
@@ -226,7 +232,9 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readOperand(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
-            errorReporting(c);
+            if (errorReporting(c)) {
+                return null;
+            }
             //continue reading each character
             sb.append((char) c);
             c = readChar();
@@ -248,7 +256,7 @@ public class LexicalScanner implements ILexicalScanner {
             c = readChar();
             //Don't include this return as part of the comment
             if (c == '\r') {
-                break;
+                return null;
             }
         }
         return new Token(new Position(lineNumber, ++columnNumber), sb.toString(), TokenType.COMMENT);
@@ -259,7 +267,14 @@ public class LexicalScanner implements ILexicalScanner {
      *
      * @param c
      */
-    public void errorReporting(int c){
+    public boolean errorReporting(int c){
+//        System.out.println(c);
+//        try {
+//            throw new Exception();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.exit(2);
+//        }
         ErrorMsg errorMsg = new ErrorMsg();
 
         if(StringUtils.isEOF(c)){
@@ -273,7 +288,9 @@ public class LexicalScanner implements ILexicalScanner {
         if (!errorMsg.getMessage().isEmpty()) { // if an error is found report it
             errorMsg.setPosition(new Position(lineNumber, ++columnNumber));
             this.errorReporter.record(errorMsg);
+            return true;
         }
+        return false;
     }
 
     public SymbolTable<String, Mnemonic> getKeywords() {

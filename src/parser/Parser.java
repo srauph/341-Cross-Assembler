@@ -36,7 +36,11 @@ public class Parser implements IParser {
      */
     public void parseTokens() {
         LineStatement ls = new LineStatement();
-        while (nextToken.getType() != TokenType.EOF) {
+        while (nextToken == null || nextToken.getType() != TokenType.EOF) {
+            if (nextToken == null) {
+                getNextToken();
+                continue;
+            }
             TokenType type = nextToken.getType();
             Position position = nextToken.getPosition();
             String value = nextToken.getValue();
