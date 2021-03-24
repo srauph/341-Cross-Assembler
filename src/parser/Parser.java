@@ -120,8 +120,11 @@ public class Parser implements IParser {
                     errorMsg.setMessage("Instruction requires an operand.");
                 } else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null) { //If instruction is inherent but contains an operand
                     errorMsg.setMessage("Inherent instruction must not have an operand.");
-                } else if(!getSuffix(keywords.get(ls.getInstruction().getMnemonic().getValue()).getValue()).isEmpty()){
-                    errorMsg.setMessage(isValidOperand(ls));
+                } else {
+                    String msg = isValidOperand(ls);
+                    if(!msg.equals("")) {
+                        errorMsg.setMessage(isValidOperand(ls));
+                    }
                 }
             }
             if (!errorMsg.getMessage().isEmpty()) {
@@ -170,7 +173,7 @@ public class Parser implements IParser {
      * @return
      */
     private String getSuffix(String value) {
-        String[] opCode = value.split(".");
+        String[] opCode = value.split("\\.");
         if(opCode.length == 0) {
             return "";
         } else return opCode[opCode.length - 1];
