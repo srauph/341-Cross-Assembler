@@ -1,3 +1,5 @@
+package errorReporting;
+
 public interface IErrorReporter {
 	
 	//Records Error detected at a specific position

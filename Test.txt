@@ -1,0 +1,6 @@
+ldc.i3 
+pop 2 
+top
+enter.u5 32
+ldc.i3   4
+ldv.u3   8 

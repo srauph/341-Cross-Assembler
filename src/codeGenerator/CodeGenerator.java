@@ -1,3 +1,5 @@
+package codeGenerator;
+
 import ir.IntermediateRep;
 import ir.LineStatement;
 import lexical.LexicalScanner;

@@ -1,3 +1,6 @@
+package errorReporting;
+
+import options.Options;
 import java.util.LinkedList;
 
 public class ErrorReporter implements IErrorReporter{
@@ -12,6 +15,12 @@ public class ErrorReporter implements IErrorReporter{
 		fileName = options.getFileName() + ".asm";
 	}
 
+	public ErrorReporter(String f){
+		list = new LinkedList<ErrorMsg>();
+		errorsReported = false;
+		fileName = f + ".asm";
+	}
+
 	public void record(ErrorMsg error){
 		this.list.add(error);
 		this.errorsReported = true;
@@ -24,8 +33,8 @@ public class ErrorReporter implements IErrorReporter{
 				System.out.print(fileName + ": Error: Line: " + list.get(errorCount).getPosition().getLineNumber() + ": " + list.get(errorCount).getMessage() + "\n");
 				errorCount++;
 			}
-			System.out.print("\n" + errorCount + " errors.");
-			System.exit(1);
+			System.out.print(errorCount + " errors.\n");
+//			System.exit(1);
 		}
 	}
 

@@ -1,11 +1,15 @@
 package lexical;
 
+import errorReporting.ErrorMsg;
+import errorReporting.ErrorReporter;
+import errorReporting.IErrorReporter;
 import lexical.token.Mnemonic;
 import lexical.token.Position;
 import lexical.token.Token;
 import lexical.token.TokenType;
 import utils.StringUtils;
 import utils.SymbolTable;
+import options.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,14 +24,16 @@ public class LexicalScanner implements ILexicalScanner {
 
     private FileInputStream fis = null;
     private SymbolTable<String, Mnemonic> keywords;
+    private IErrorReporter errorReporter;
 
     public LexicalScanner(String inputFile) {
         try {
             File file = new File(inputFile);
-            file.setWritable(false);
+            file.setWritable(true);
             fis = new FileInputStream(file);
             keywords = new SymbolTable<>();
             initKeywordTable();
+            errorReporter = new ErrorReporter(inputFile);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             System.exit(0);
@@ -126,7 +132,7 @@ public class LexicalScanner implements ILexicalScanner {
         }
 
         //Check EOF
-        if (c == 65535 || c == '\0') {
+        if (StringUtils.isEOF(c)) {
             return new Token(new Position(lineNumber, 0), "EOF", TokenType.EOF);
         }
 
@@ -141,6 +147,11 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readStringOperand(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
+            if (errorReporting(c)) {
+                this.columnNumber = 0;
+                ++lineNumber;//Increment after
+                return null;
+            }
             //continue reading each character
             sb.append((char) c);
             c = readChar();
@@ -156,6 +167,11 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readDirective(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
+            if (errorReporting(c)) {
+                this.columnNumber = 0;
+                ++lineNumber;//Increment after
+                return null;
+            }
             //continue reading each character
             sb.append((char) c);
             c = readChar();
@@ -200,6 +216,11 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readAddressing(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
+            if (errorReporting(c)) {
+                this.columnNumber = 0;
+                ++lineNumber;//Increment after
+                return null;
+            }
             //continue reading each character
             sb.append((char) c);
             c = readChar();
@@ -217,6 +238,11 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readOperand(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
+            if (errorReporting(c)) {
+                this.columnNumber = 0;
+                ++lineNumber;//Increment after
+                return null;
+            }
             //continue reading each character
             sb.append((char) c);
             c = readChar();
@@ -238,10 +264,41 @@ public class LexicalScanner implements ILexicalScanner {
             c = readChar();
             //Don't include this return as part of the comment
             if (c == '\r') {
-                break;
+                return null;
             }
         }
         return new Token(new Position(lineNumber, ++columnNumber), sb.toString(), TokenType.COMMENT);
+    }
+
+    /**
+     * Analyzes scanner and report error if one is found.
+     *
+     * @param c
+     */
+    public boolean errorReporting(int c){
+//        System.out.println(c);
+//        try {
+//            throw new Exception();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.exit(2);
+//        }
+        ErrorMsg errorMsg = new ErrorMsg();
+
+        if(StringUtils.isEOF(c)){
+            errorMsg.setMessage("eof in string");
+        }
+
+        if(StringUtils.isEOL(c)){
+            errorMsg.setMessage("eol in string");
+        }
+
+        if (!errorMsg.getMessage().isEmpty()) { // if an error is found report it
+            errorMsg.setPosition(new Position(lineNumber, ++columnNumber));
+            this.errorReporter.record(errorMsg);
+            return true;
+        }
+        return false;
     }
 
     public SymbolTable<String, Mnemonic> getKeywords() {
