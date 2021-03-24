@@ -47,12 +47,6 @@ public class Parser implements IParser {
 
             switch (type) {
                 case EOL:               //If token is EOL, LS is finished, add it to IR and start a new one.
-                    if (ls.getInstruction() != null) {
-                        if (ls.getInstruction().getOperand() == null) {
-                            ls.getInstruction().getMnemonic().setMode("inherent");
-                        }
-                    }
-
                     //Error Reporting
                     errorReporting(ls);
 
@@ -90,7 +84,6 @@ public class Parser implements IParser {
                     Operand operand = new Operand(position, value);
                     operand.setOperand(Integer.parseInt(value));
                     ls.getInstruction().setOperand(operand); //set instruction's opcode
-                    ls.getInstruction().getMnemonic().setMode("immediate");
                     break;
                 default:
                     ErrorMsg unknown_token = new ErrorMsg("Unknown token", nextToken.getPosition());
@@ -121,9 +114,9 @@ public class Parser implements IParser {
                 } else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null) { //If instruction is inherent but contains an operand
                     errorMsg.setMessage("Inherent instruction must not have an operand.");
                 } else {
-                    String msg = isValidOperand(ls);
+                    String msg = checkInvalidOperand(ls);
                     if(!msg.equals("")) {
-                        errorMsg.setMessage(isValidOperand(ls));
+                        errorMsg.setMessage(msg);
                     }
                 }
             }
@@ -134,7 +127,7 @@ public class Parser implements IParser {
         }
     }
 
-    private String isValidOperand(LineStatement ls) {
+    private String checkInvalidOperand(LineStatement ls) {
         String errorMessage = "";
         String suffix = getSuffix(ls.getInstruction().getValue());
         int opCode = Integer.parseInt(ls.getInstruction().getOperand().getValue());
