@@ -1,4 +1,4 @@
-package codeGenerator;
+package codegen;
 
 import ir.IntermediateRep;
 import ir.LineStatement;

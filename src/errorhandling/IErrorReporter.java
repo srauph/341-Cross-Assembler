@@ -1,4 +1,4 @@
-package errorReporting;
+package errorhandling;
 
 public interface IErrorReporter {
 	

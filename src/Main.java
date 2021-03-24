@@ -1,4 +1,4 @@
-import errorReporting.ErrorReporter;
+import errorhandling.ErrorReporter;
 import lexical.LexicalScanner;
 import options.Options;
 import parser.Parser;

@@ -1,8 +1,8 @@
 package lexical;
 
-import errorReporting.ErrorMsg;
-import errorReporting.ErrorReporter;
-import errorReporting.IErrorReporter;
+import errorhandling.ErrorMsg;
+import errorhandling.ErrorReporter;
+import errorhandling.IErrorReporter;
 import lexical.token.Mnemonic;
 import lexical.token.Position;
 import lexical.token.Token;
@@ -19,7 +19,6 @@ public class LexicalScanner implements ILexicalScanner {
 
     private int lineNumber = 1;
     private int columnNumber = 0;
-    private int currentColumn = 0;
 
     private FileInputStream fis = null;
     private SymbolTable<String, Mnemonic> keywords;
@@ -28,7 +27,7 @@ public class LexicalScanner implements ILexicalScanner {
     public LexicalScanner(String inputFile) {
         try {
             File file = new File(inputFile);
-            file.setWritable(true);
+            file.setWritable(false);
             fis = new FileInputStream(file);
             keywords = new SymbolTable<>();
             initKeywordTable();
@@ -119,7 +118,6 @@ public class LexicalScanner implements ILexicalScanner {
         if (StringUtils.isSemicolon(c)) {
             return readComment(c, sb);
         }
-
 
         //Check if next valid character is an EOL
         if (StringUtils.isEOL(c)) {

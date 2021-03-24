@@ -1,7 +1,7 @@
 package parser;
 
-import errorReporting.ErrorMsg;
-import errorReporting.IErrorReporter;
+import errorhandling.ErrorMsg;
+import errorhandling.IErrorReporter;
 import ir.IntermediateRep;
 import ir.LineStatement;
 import lexical.LexicalScanner;

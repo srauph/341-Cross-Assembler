@@ -1,4 +1,4 @@
-package errorReporting;
+package errorhandling;
 
 import options.Options;
 import java.util.LinkedList;

@@ -1,4 +1,4 @@
-package errorReporting;
+package errorhandling;
 
 import lexical.token.Position;
 
