@@ -79,7 +79,7 @@ public class Parser implements IParser {
                     }
                     break;
                 case OPERAND:
-                    //System.out.println("[Debug] - " + nextToken);
+                   // System.out.println("[Debug] - " + nextToken);
                     ls.getInstruction().getMnemonic().setOpCode(Integer.parseInt(value)); //Set mnemonic's opcode
                     Operand operand = new Operand(position, value);
                     operand.setOperand(Integer.parseInt(value));
