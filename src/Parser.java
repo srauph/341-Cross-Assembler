@@ -78,19 +78,27 @@ public class Parser implements IParser {
                     // Chunky: Code to figure out how much to ass to the opcode to make it match the table the prof gave.
                     // Chunky: TLDR: base from keywords + operand + offset if negative = opcode
                     Mnemonic mne = ls.getInstruction().getMnemonic();
-                    int opc = mne.getOpCode()+Integer.parseInt(value);
-                    if (Integer.parseInt(value) < 0) {
-                        switch (mne.getValue().split("\\.")[1]) {
-                            case "i3":
+                    int opc = Integer.parseInt(value);
+                    System.out.println(opc);
+                    switch (mne.getValue().split("\\.")[1]) {
+                        case "u3":
+                            opc -= 4;
+                        case "i3":
+                            if (opc < 0) {
                                 opc += 8;
-                                break;
-                            case "i5":
+                            }
+                            break;
+                        case "u5":
+                            opc -= 16;
+                        case "i5":
+                            if (opc < 0) {
                                 opc += 32;
-                                break;
-                            default:
-                                break;
-                        }
+                            }
+                            break;
+                        default:
+                            break;
                     }
+                    opc += mne.getOpCode();
                     ls.getInstruction().getMnemonic().setOpCode(opc); //Set mnemonic's opcode
 //                    System.out.println(ls + "\n");
                     Operand operand = new Operand(position, value);
