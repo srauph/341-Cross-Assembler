@@ -148,6 +148,8 @@ public class LexicalScanner implements ILexicalScanner {
     private Token readStringOperand(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
             if (errorReporting(c)) {
+                this.columnNumber = 0;
+                ++lineNumber;//Increment after
                 return null;
             }
             //continue reading each character
@@ -166,6 +168,8 @@ public class LexicalScanner implements ILexicalScanner {
     private Token readDirective(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
             if (errorReporting(c)) {
+                this.columnNumber = 0;
+                ++lineNumber;//Increment after
                 return null;
             }
             //continue reading each character
@@ -213,6 +217,8 @@ public class LexicalScanner implements ILexicalScanner {
     private Token readAddressing(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
             if (errorReporting(c)) {
+                this.columnNumber = 0;
+                ++lineNumber;//Increment after
                 return null;
             }
             //continue reading each character
@@ -233,6 +239,8 @@ public class LexicalScanner implements ILexicalScanner {
     private Token readOperand(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
             if (errorReporting(c)) {
+                this.columnNumber = 0;
+                ++lineNumber;//Increment after
                 return null;
             }
             //continue reading each character
