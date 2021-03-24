@@ -68,10 +68,31 @@ public class Parser implements IParser {
                     ls.setInstruction(new Instruction(position, value)); // Set instruction
                     //Set newly created instruction's mnemonic
                     ls.getInstruction().setMnemonic(new Mnemonic(position, value));
+                    // Chunky: Set the opcode to the one defined in keywords. This will be changed later to match.
+                    ls.getInstruction().getMnemonic().setOpCode(keywords.get(value).getOpCode());
+//                    System.out.println(ls + "\n");
                     break;
                 case OPERAND:
                     //System.out.println("[Debug] - " + nextToken);
-                    ls.getInstruction().getMnemonic().setOpCode(Integer.parseInt(value)); //Set mnemonic's opcode
+//                    System.out.println(ls);
+                    // Chunky: Code to figure out how much to ass to the opcode to make it match the table the prof gave.
+                    // Chunky: TLDR: base from keywords + operand + offset if negative = opcode
+                    Mnemonic mne = ls.getInstruction().getMnemonic();
+                    int opc = mne.getOpCode()+Integer.parseInt(value);
+                    if (Integer.parseInt(value) < 0) {
+                        switch (mne.getValue().split("\\.")[1]) {
+                            case "i3":
+                                opc += 8;
+                                break;
+                            case "i5":
+                                opc += 32;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    ls.getInstruction().getMnemonic().setOpCode(opc); //Set mnemonic's opcode
+//                    System.out.println(ls + "\n");
                     Operand operand = new Operand(position, value);
                     operand.setOperand(Integer.parseInt(value));
                     ls.getInstruction().setOperand(operand); //set instruction's opcode
