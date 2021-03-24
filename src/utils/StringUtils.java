@@ -29,4 +29,12 @@ public class StringUtils {
     public static boolean isMinusSign(int c) {
         return c == 45;
     }
+
+    public static boolean isPeriod(char c) {
+        return c == 46;
+    }
+
+    public static boolean isQuote(char c) {
+        return c == 34;
+    }
 }

@@ -6,6 +6,7 @@ public enum TokenType {
     INSTRUCTION("Instruction"),
     OPERAND("Operand"),
     DIRECTIVE("Directive"),
+    STRING_OPERAND("StringOperand"),
     COMMENT("Comment"),
     EOL("EOL"),
     EOF("EOF"),
