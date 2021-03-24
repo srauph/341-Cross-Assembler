@@ -120,6 +120,7 @@ public class LexicalScanner implements ILexicalScanner {
             return readComment(c, sb);
         }
 
+
         //Check if next valid character is an EOL
         if (StringUtils.isEOL(c)) {
             Position pos = new Position(lineNumber, ++columnNumber);
@@ -146,7 +147,7 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readStringOperand(int c, StringBuilder sb) {
         Position pos = new Position(lineNumber, ++columnNumber);
-        while (!StringUtils.isSpace(c) && !StringUtils.isEOF(c)) {
+        while (!StringUtils.isSpace(c)) {
             validateCharacter(c, pos);
             //continue reading each character
             sb.append((char) c);
@@ -229,8 +230,7 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readOperand(int c, StringBuilder sb) {
         Position pos = new Position(lineNumber, ++columnNumber);
-        while (!StringUtils.isIgnoredCharacter(c)) {
-
+        while (!StringUtils.isIgnoredCharacter(c) && !StringUtils.isEOF(c)) {
             validateCharacter(c, pos);
             //continue reading each character
             sb.append((char) c);

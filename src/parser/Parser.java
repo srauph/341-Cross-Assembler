@@ -36,22 +36,24 @@ public class Parser implements IParser {
      */
     public void parseTokens() {
         LineStatement ls = new LineStatement();
-        while (nextToken == null || nextToken.getType() != TokenType.EOF) {
-            if (nextToken == null) {
-                getNextToken();
-                continue;
-            }
+        while (true) {
             TokenType type = nextToken.getType();
             Position position = nextToken.getPosition();
             String value = nextToken.getValue();
 
             switch (type) {
-                case EOL:               //If token is EOL, LS is finished, add it to IR and start a new one.
+                //If token is EOL, LS is finished, add it to IR and start a new one.
+                //Depending on how the input file is made, if does not end with an EOL, it will end with an EOF
+                case EOF:
+                case EOL:
                     //Error Reporting
                     errorReporting(ls);
 
                     ir.add(ls);
                     ls = new LineStatement();
+                    if (nextToken.getType() == TokenType.EOF) {
+                        return;
+                    }
                     break;
                 case DIRECTIVE:
                     Directive dr = new Directive(position, value);

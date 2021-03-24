@@ -3,9 +3,12 @@ package utils;
 public class StringUtils {
 
     public static boolean isIgnoredCharacter(int c) {
-        return c == 13 || isSpace(c);
+        return isReturn(c) || isSpace(c);
     }
 
+    public static boolean isReturn(int c) {
+        return c == 13;
+    }
     public static boolean isSpace(int c) {
         return c == 32;
     }
