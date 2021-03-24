@@ -15,6 +15,12 @@ public class ErrorReporter implements IErrorReporter{
 		fileName = options.getFileName() + ".asm";
 	}
 
+	public ErrorReporter(String f){
+		list = new LinkedList<ErrorMsg>();
+		errorsReported = false;
+		fileName = f + ".asm";
+	}
+
 	public void record(ErrorMsg error){
 		this.list.add(error);
 		this.errorsReported = true;

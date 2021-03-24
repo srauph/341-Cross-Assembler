@@ -1,6 +1,7 @@
 package lexical;
 
 import errorReporting.ErrorMsg;
+import errorReporting.ErrorReporter;
 import errorReporting.IErrorReporter;
 import lexical.token.Mnemonic;
 import lexical.token.Position;
@@ -8,6 +9,7 @@ import lexical.token.Token;
 import lexical.token.TokenType;
 import utils.StringUtils;
 import utils.SymbolTable;
+import options.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,10 +29,11 @@ public class LexicalScanner implements ILexicalScanner {
     public LexicalScanner(String inputFile) {
         try {
             File file = new File(inputFile);
-            file.setWritable(false);
+            file.setWritable(true);
             fis = new FileInputStream(file);
             keywords = new SymbolTable<>();
             initKeywordTable();
+            errorReporter = new ErrorReporter(inputFile);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             System.exit(0);
