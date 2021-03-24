@@ -1,3 +1,5 @@
+package errorReporting;
+
 import lexical.token.Position;
 
 public class ErrorMsg {

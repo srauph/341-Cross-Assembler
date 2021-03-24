@@ -1,3 +1,5 @@
+package options;
+
 import java.io.File;
 
 public class Options {
@@ -9,7 +11,7 @@ public class Options {
     private String inputfile;
     private String filename;
 
-    Options() {
+    public Options() {
         verbose = false;
         help = false;
         listing = false;
@@ -17,7 +19,7 @@ public class Options {
         filename = "";
     }
 
-    Options(String[] args) {
+    public Options(String[] args) {
 
         verbose = false;
         help = false;

@@ -1,5 +1,7 @@
 package lexical;
 
+import errorReporting.ErrorMsg;
+import errorReporting.IErrorReporter;
 import lexical.token.Mnemonic;
 import lexical.token.Position;
 import lexical.token.Token;
@@ -20,6 +22,7 @@ public class LexicalScanner implements ILexicalScanner {
 
     private FileInputStream fis = null;
     private SymbolTable<String, Mnemonic> keywords;
+    private IErrorReporter errorReporter;
 
     public LexicalScanner(String inputFile) {
         try {
@@ -242,6 +245,17 @@ public class LexicalScanner implements ILexicalScanner {
             }
         }
         return new Token(new Position(lineNumber, ++columnNumber), sb.toString(), TokenType.COMMENT);
+    }
+
+    public void errorReporing(char c){
+        ErrorMsg errorMsg = new ErrorMsg();
+
+        if(StringUtils.isEOL(c)){
+            if (!errorMsg.getMessage().isEmpty()) {
+                errorMsg.setPosition(new Position(lineNumber, ++columnNumber));
+                this.errorReporter.record(errorMsg);
+            }
+        }
     }
 
     public SymbolTable<String, Mnemonic> getKeywords() {

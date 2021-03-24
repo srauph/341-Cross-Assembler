@@ -1,3 +1,7 @@
+package parser;
+
+import errorReporting.ErrorMsg;
+import errorReporting.IErrorReporter;
 import ir.IntermediateRep;
 import ir.LineStatement;
 import lexical.LexicalScanner;
@@ -108,7 +112,7 @@ public class Parser implements IParser {
                     errorMsg.setMessage("Inherent instruction must not have an operand.");
                 }
             }
-            if (!errorMsg.msg.isEmpty()) {
+            if (!errorMsg.getMessage().isEmpty()) {
                 errorMsg.setPosition(token.getPosition());
                 this.errorReporter.record(errorMsg);
             }

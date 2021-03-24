@@ -1,3 +1,6 @@
+package errorReporting;
+
+import options.Options;
 import java.util.LinkedList;
 
 public class ErrorReporter implements IErrorReporter{
