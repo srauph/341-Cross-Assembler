@@ -69,9 +69,16 @@ public class Parser implements IParser {
                     ls.setComment(new Comment(position, value));
                     break;
                 case MNEMONIC:          //If token is a mnemonic
-                    ls.setInstruction(new Instruction(position, value)); // Set instruction
-                    //Set newly created instruction's mnemonic
-                    ls.getInstruction().setMnemonic(new Mnemonic(position, value));
+                    Mnemonic mnemonic = keywords.get(value);
+                    if(mnemonic != null) {
+                        ls.setInstruction(new Instruction(position, value)); // Set instruction
+                        //Set newly created instruction's mnemonic
+                        ls.getInstruction().setMnemonic(new Mnemonic(position, value));
+                        ls.getInstruction().getMnemonic().setMode(mnemonic.getMode());
+                    } else {
+                        ErrorMsg errorMsg = new ErrorMsg("Invalid mnemonic or directive.", position);
+                        this.errorReporter.record(errorMsg);
+                    }
                     break;
                 case OPERAND:
                     //System.out.println("[Debug] - " + nextToken);
@@ -99,14 +106,13 @@ public class Parser implements IParser {
      *
      * @param ls
      */
-    public void errorReporting(LineStatement ls) {
+    private void errorReporting(LineStatement ls) {
         ErrorMsg errorMsg = new ErrorMsg();
         Token token = nextToken;
+
         if (ls.getInstruction() != null) {//if no instruction then we assume its a line with only a comment and ignore it
-            if (keywords.get(ls.getInstruction().getMnemonic().getValue()) == null) { //If Mnemonic not found in symbol table, it is considered invalid
-                errorMsg.setMessage("Invalid mnemonic or directive.");
-            } else if (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null) {
-                if (!keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() == null) { //If instruction in not inherent (immediate or relative) but does not have an operand
+           if (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null) {
+                if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("immediate") && ls.getInstruction().getOperand() == null) { //If instruction in not inherent (immediate or relative) but does not have an operand
                     errorMsg.setMessage("Instruction requires an operand.");
                 } else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null) { //If instruction is inherent but contains an operand
                     errorMsg.setMessage("Inherent instruction must not have an operand.");
@@ -117,6 +123,32 @@ public class Parser implements IParser {
                 this.errorReporter.record(errorMsg);
             }
         }
+    }
+
+//    private boolean isValidOperand(LineStatement ls) {
+//        String suffix = getSuffix(ls.getInstruction().getValue());
+//        int opCode = Integer.parseInt(ls.getInstruction().getOperand().getValue());
+//
+//        switch(suffix) {
+//            case "i3":
+//                if(opCode < 0 || opCode > 31) {
+//
+//                }
+//        }
+//
+//    }
+
+
+
+    /**
+     * Returns a string corresponding to the suffix of passed Mnemonic. Suffix
+     * express the size and range of fields withing operation codes and operands.
+     * @param value
+     * @return
+     */
+    private String getSuffix(String value) {
+        String[] opCode = value.split(".");
+        return opCode[opCode.length - 1];
     }
 
     private void getNextToken() {
