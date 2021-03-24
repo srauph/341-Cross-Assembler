@@ -129,7 +129,7 @@ public class LexicalScanner implements ILexicalScanner {
         }
 
         //Check EOF
-        if (c == 65535 || c == '\0') {
+        if (StringUtils.isEOF(c)) {
             return new Token(new Position(lineNumber, 0), "EOF", TokenType.EOF);
         }
 
@@ -144,6 +144,7 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readStringOperand(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
+            errorReporting(c);
             //continue reading each character
             sb.append((char) c);
             c = readChar();
@@ -159,6 +160,7 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readDirective(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
+            errorReporting(c);
             //continue reading each character
             sb.append((char) c);
             c = readChar();
@@ -203,6 +205,7 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readAddressing(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
+            errorReporting(c);
             //continue reading each character
             sb.append((char) c);
             c = readChar();
@@ -220,6 +223,7 @@ public class LexicalScanner implements ILexicalScanner {
      */
     private Token readOperand(int c, StringBuilder sb) {
         while (!StringUtils.isSpace(c)) {
+            errorReporting(c);
             //continue reading each character
             sb.append((char) c);
             c = readChar();
@@ -247,14 +251,25 @@ public class LexicalScanner implements ILexicalScanner {
         return new Token(new Position(lineNumber, ++columnNumber), sb.toString(), TokenType.COMMENT);
     }
 
-    public void errorReporing(char c){
+    /**
+     * Analyzes scanner and report error if one is found.
+     *
+     * @param c
+     */
+    public void errorReporting(int c){
         ErrorMsg errorMsg = new ErrorMsg();
 
         if(StringUtils.isEOL(c)){
-            if (!errorMsg.getMessage().isEmpty()) {
-                errorMsg.setPosition(new Position(lineNumber, ++columnNumber));
-                this.errorReporter.record(errorMsg);
-            }
+            errorMsg.setMessage("eof in string");
+        }
+
+        if(StringUtils.isEOF(c)){
+            errorMsg.setMessage("eol in string");
+        }
+
+        if (!errorMsg.getMessage().isEmpty()) { // if an error is found report it
+            errorMsg.setPosition(new Position(lineNumber, ++columnNumber));
+            this.errorReporter.record(errorMsg);
         }
     }
 

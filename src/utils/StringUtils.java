@@ -14,6 +14,8 @@ public class StringUtils {
         return c == 10;
     }
 
+    public static boolean isEOF(int c) {return c == 65535 || c == '\0';}
+
     public static String getHexFromDecimal(int number, int padding, boolean hasXPrefix) {
         return String.format((hasXPrefix ? "0x%0" : "%0") + padding + "X", number);
     }
