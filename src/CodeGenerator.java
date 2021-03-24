@@ -29,7 +29,7 @@ public class CodeGenerator {
     public void generateListing() {
         StringBuilder lst = new StringBuilder();
         // Chunky: Changed the line to more closely match the prof's example.
-        lst.append("Line Addr Machine Code  Label         Assembly Code        Comments\r\n");
+        lst.append("Line Addr Code          Label         Mne       Operand       Comments\r\n");
         int linePosition = 1;
         int addr = 0;
         for (LineStatement ls : ir.getStatements()) {
