@@ -262,11 +262,11 @@ public class LexicalScanner implements ILexicalScanner {
     public void errorReporting(int c){
         ErrorMsg errorMsg = new ErrorMsg();
 
-        if(StringUtils.isEOL(c)){
+        if(StringUtils.isEOF(c)){
             errorMsg.setMessage("eof in string");
         }
 
-        if(StringUtils.isEOF(c)){
+        if(StringUtils.isEOL(c)){
             errorMsg.setMessage("eol in string");
         }
 
