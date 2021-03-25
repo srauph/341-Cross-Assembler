@@ -26,4 +26,11 @@ public class IntermediateRep implements IIntermediateRep {
     public LinkedList<LineStatement> getStatements() {
         return intermediateRep;
     }
+
+    @Override
+    public String toString() {
+        return "IntermediateRep{" +
+                "intermediateRep=" + intermediateRep +
+                '}';
+    }
 }

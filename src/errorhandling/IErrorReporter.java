@@ -6,6 +6,6 @@ public interface IErrorReporter {
 	void record(ErrorMsg error);
 
 	//Reports all errors
-	void report();
+	void checkReports();
 
 }
