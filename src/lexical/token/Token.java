@@ -9,9 +9,9 @@ public class Token implements IToken {
     public Token() {
     }
 
-    public Token(Position pos, String name, TokenType type) {
+    public Token(Position pos, String value, TokenType type) {
         this.pos = pos;
-        this.value = name;
+        this.value = value;
         this.type = type;
     }
 

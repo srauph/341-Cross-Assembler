@@ -24,6 +24,11 @@ public class LexicalScanner implements ILexicalScanner {
     private SymbolTable<String, Mnemonic> keywords;
     private IErrorReporter errorReporter;
 
+    public LexicalScanner() {
+        keywords = new SymbolTable<>();
+        initKeywordTable();
+    }
+
     public LexicalScanner(String inputFile) {
         try {
             File file = new File(inputFile);
@@ -130,7 +135,7 @@ public class LexicalScanner implements ILexicalScanner {
 
         //Check EOF
         if (StringUtils.isEOF(c)) {
-            errorReporter.report();
+            errorReporter.checkReports();
             //Check if any errors for scanner exist and if so, print and terminate?
             return new Token(new Position(lineNumber, 0), "EOF", TokenType.EOF);
         }
@@ -246,7 +251,7 @@ public class LexicalScanner implements ILexicalScanner {
      * @return comment token
      */
     private Token readComment(int c, StringBuilder sb) {
-        while (!StringUtils.isEOL(c) && c != '\r') {
+        while (!StringUtils.isEOL(c) && c != '\r' && !StringUtils.isEOF(c)) {
             //continue reading each character
             sb.append((char) c);
             c = readChar();

@@ -1,3 +1,7 @@
+package parser;
+
+import errorhandling.ErrorMsg;
+import errorhandling.IErrorReporter;
 import ir.IntermediateRep;
 import ir.LineStatement;
 import lexical.LexicalScanner;
@@ -6,17 +10,23 @@ import utils.SymbolTable;
 
 public class Parser implements IParser {
     //Sequence of line statements
-    private final IntermediateRep ir = new IntermediateRep();
-    // private final LinkedList<ir.LineStatement> intermediateRep = new LinkedList<>();
-    private final LexicalScanner lexicalScanner;
-    private final SymbolTable<String, Mnemonic> keywords;
+    private IntermediateRep ir = new IntermediateRep();
+    private LexicalScanner lexicalScanner = null;
+    private SymbolTable<String, Mnemonic> keywords = null;
     private Token nextToken;
-    private IErrorReporter errorReporter;
+    private final IErrorReporter errorReporter;
+    private boolean isTesting = false;
+    private LineStatement ls = new LineStatement();
 
     public Parser(LexicalScanner lexicalScanner, SymbolTable<String, Mnemonic> keywords, IErrorReporter errorRep) {
+        this(lexicalScanner, keywords, errorRep, false);
+    }
+
+    public Parser(LexicalScanner lexicalScanner, SymbolTable<String, Mnemonic> keywords, IErrorReporter errorRep, boolean isTesting) {
+        this.isTesting = isTesting;
         this.lexicalScanner = lexicalScanner;
         this.keywords = keywords;
-        this.nextToken = lexicalScanner.getNextToken();
+        this.getNextToken();
         this.errorReporter = errorRep;
     }
 
@@ -31,25 +41,23 @@ public class Parser implements IParser {
      * LineStatement = [ Label ] [ Instruction | Directive ] [ Comment ] EOL .
      */
     public void parseTokens() {
-        LineStatement ls = new LineStatement();
-        while (nextToken.getType() != TokenType.EOF) {
+        while (true) {
             TokenType type = nextToken.getType();
             Position position = nextToken.getPosition();
             String value = nextToken.getValue();
-
             switch (type) {
-                case EOL:               //If token is EOL, LS is finished, add it to IR and start a new one.
-                    if (ls.getInstruction() != null) {
-                        if (ls.getInstruction().getOperand() == null) {
-                            ls.getInstruction().getMnemonic().setMode("inherent");
-                        }
-                    }
-
+                //If token is EOL, LS is finished, add it to IR and start a new one.
+                //Depending on how the input file is made, if does not end with an EOL, it will end with an EOF
+                case EOF:
+                case EOL:
                     //Error Reporting
                     errorReporting(ls);
 
                     ir.add(ls);
                     ls = new LineStatement();
+                    if (nextToken.getType() == TokenType.EOF) {
+                        return;
+                    }
                     break;
                 case DIRECTIVE:
                     Directive dr = new Directive(position);
@@ -65,46 +73,54 @@ public class Parser implements IParser {
                     ls.setComment(new Comment(position, value));
                     break;
                 case MNEMONIC:          //If token is a mnemonic
-                    ls.setInstruction(new Instruction(position, value)); // Set instruction
-                    //Set newly created instruction's mnemonic
-                    ls.getInstruction().setMnemonic(new Mnemonic(position, value));
-                    // Chunky: Set the opcode to the one defined in keywords. This will be changed later to match.
-                    ls.getInstruction().getMnemonic().setOpCode(keywords.get(value).getOpCode());
-//                    System.out.println(ls + "\n");
+                    Mnemonic mnemonic = keywords.get(value);
+                    if (mnemonic != null) {
+                        ls.setInstruction(new Instruction(position, value)); // Set instruction
+                        //Set newly created instruction's mnemonic
+                        ls.getInstruction().setMnemonic(new Mnemonic(position, value));
+                        ls.getInstruction().getMnemonic().setMode(mnemonic.getMode());
+                        // Chunky: Added this line
+                        ls.getInstruction().getMnemonic().setOpCode(keywords.get(value).getOpCode());
+                    } else {
+                        ErrorMsg errorMsg = new ErrorMsg("Invalid mnemonic or directive.", position);
+                        this.errorReporter.record(errorMsg);
+                    }
                     break;
                 case OPERAND:
                     //System.out.println("[Debug] - " + nextToken);
-//                    System.out.println(ls);
                     // Chunky: Code to figure out how much to ass to the opcode to make it match the table the prof gave.
                     // Chunky: TLDR: base from keywords + operand + offset to account for bit shifts = opcode
                     Mnemonic mne = ls.getInstruction().getMnemonic();
                     int opc = Integer.parseInt(value);
-//                    System.out.println(opc);
-                    switch (mne.getValue().split("\\.")[1]) {
-                        case "i3":
-                            if (opc < 0) {
-                                opc += 8;
-                            }
-                            break;
-                        case "u5":
-                            if (opc < 16) {
-                                opc += 16;
-                            } else {
-                                opc -= 16;
-                            }
-                            break;
+                    try {
+                        switch (mne.getValue().split("\\.")[1]) {
+                            case "i3":
+                                if (opc < 0) {
+                                    opc += 8;
+                                }
+                                break;
+                            case "u5":
+                                if (opc < 16) {
+                                    opc += 16;
+                                } else {
+                                    opc -= 16;
+                                }
+                                break;
+                        }
+                    } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
                     }
                     opc += mne.getOpCode();
                     ls.getInstruction().getMnemonic().setOpCode(opc); //Set mnemonic's opcode
-//                    System.out.println(ls + "\n");
                     Operand operand = new Operand(position, value);
                     operand.setOperand(Integer.parseInt(value));
                     ls.getInstruction().setOperand(operand); //set instruction's opcode
-                    ls.getInstruction().getMnemonic().setMode("immediate");
                     break;
                 default:
                     ErrorMsg unknown_token = new ErrorMsg("Unknown token", nextToken.getPosition());
                     errorReporter.record(unknown_token);
+            }
+            if (isTesting){
+                return;
             }
             //Get the next token to process
             getNextToken();
@@ -120,27 +136,99 @@ public class Parser implements IParser {
      *
      * @param ls
      */
-    public void errorReporting(LineStatement ls) {
+    private void errorReporting(LineStatement ls) {
         ErrorMsg errorMsg = new ErrorMsg();
         Token token = nextToken;
+
         if (ls.getInstruction() != null) {//if no instruction then we assume its a line with only a comment and ignore it
-            if (keywords.get(ls.getInstruction().getMnemonic().getValue()) == null) { //If Mnemonic not found in symbol table, it is considered invalid
-                errorMsg.setMessage("Invalid mnemonic or directive.");
-            } else if (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null) {
-                if (!keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() == null) { //If instruction in not inherent (immediate or relative) but does not have an operand
+            if (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null) {
+                if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("immediate") && ls.getInstruction().getOperand() == null) { //If instruction in not inherent (immediate or relative) but does not have an operand
                     errorMsg.setMessage("Instruction requires an operand.");
                 } else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null) { //If instruction is inherent but contains an operand
                     errorMsg.setMessage("Inherent instruction must not have an operand.");
+                } else {
+                    String msg = checkInvalidOperand(ls);
+                    if (!msg.equals("")) {
+                        errorMsg.setMessage(msg);
+                    }
                 }
             }
-            if (!errorMsg.msg.isEmpty()) {
+            if (!errorMsg.getMessage().isEmpty()) {
                 errorMsg.setPosition(token.getPosition());
                 this.errorReporter.record(errorMsg);
             }
         }
     }
 
+    private String checkInvalidOperand(LineStatement ls) {
+        String errorMessage = "";
+        String suffix = getSuffix(ls.getInstruction().getValue());
+        int opCode = Integer.parseInt(ls.getInstruction().getOperand().getValue());
+        String mnemonic = ls.getInstruction().getMnemonic().getValue();
+
+        if (suffix != null) {
+            switch (suffix) {
+                case "u5":
+                    if (opCode < 0 || opCode > 31) {
+                        errorMessage = "The immediate instruction \'" + mnemonic +
+                                "\' must have a 5-bit unsigned operand number ranging from 0 to 31.";
+                    }
+                    break;
+                case "u3":
+                    if (opCode < 0 || opCode > 7) {
+                        errorMessage = "The immediate instruction \'" + mnemonic +
+                                "\' must have a 3-bit unsigned operand number ranging from 0 to 7.";
+                    }
+                    break;
+                case "i3":
+                    if (opCode < -4 || opCode > 3) {
+                        errorMessage = "The immediate instruction \'" + mnemonic +
+                                "\' must have a 3-bit unsigned operand number ranging from -4 to 3.";
+                    }
+                    break;
+            }
+        }
+        return errorMessage;
+    }
+
+
+    /**
+     * Returns a string corresponding to the suffix of passed Mnemonic. Suffix
+     * express the size and range of fields withing operation codes and operands.
+     *
+     * @param value
+     * @return
+     */
+    private String getSuffix(String value) {
+        String[] opCode = value.split("\\.");
+        if (opCode.length == 0) {
+            return "";
+        } else return opCode[opCode.length - 1];
+    }
+
     private void getNextToken() {
-        this.nextToken = lexicalScanner.getNextToken();
+        if (!isTesting) {
+            this.nextToken = lexicalScanner.getNextToken();
+        }
+    }
+
+    public void setNextToken(Token nextToken) {
+        this.nextToken = nextToken;
+    }
+
+    public IntermediateRep getIr() {
+        return ir;
+    }
+
+    public boolean isTesting() {
+        return isTesting;
+    }
+
+    public void setTesting(boolean isTesting) {
+        this.isTesting = isTesting;
+    }
+
+    public void setIr(IntermediateRep ir) {
+        this.ir = ir;
     }
 }

@@ -4,7 +4,6 @@ import ir.IntermediateRep;
 import ir.LineStatement;
 import lexical.LexicalScanner;
 import lexical.token.Mnemonic;
-import lexical.token.Token;
 import utils.StringUtils;
 import utils.SymbolTable;
 
@@ -31,7 +30,7 @@ public class CodeGenerator {
     public void generateListing() {
         StringBuilder lst = new StringBuilder();
         // Chunky: Changed the line to more closely match the prof's example.
-        lst.append("Line Addr Code          Label         Mne       Operand       Comments\r\n");
+        lst.append("Line Addr Code          Label         Mne         Operand             Comments\r\n");
         int linePosition = 1;
         int addr = 0;
         for (LineStatement ls : ir.getStatements()) {
@@ -52,14 +51,14 @@ public class CodeGenerator {
                 addr++;
             }
 
-            //Code
+            //Machine Code
             // Chunky: Code breaks if it's null. I'm not fully sure why because 7am brain. Maybe i'll figure it out in the morn.
             if (ls.getInstruction() != null) {
-                Mnemonic mne = (Mnemonic) keyword.get(ls.getInstruction().getMnemonic().getValue());
+                Mnemonic mne = keyword.get(ls.getInstruction().getMnemonic().getValue());
                 lst.append(StringUtils.getCustomFormat(
                         4,
                         // Chunky: pull the opcode and print that
-                        StringUtils.getHexFromDecimal(mne == null ? -1 : /*mne.getOpCode()+*/ls.getInstruction().getMnemonic().getOpCode(), 2, false)
+                        StringUtils.getHexFromDecimal(mne == null ? -1 : ls.getInstruction().getMnemonic().getOpCode(), 2, false)
                 ));
             }
             //Temp mne null check, will function much smarter later on
