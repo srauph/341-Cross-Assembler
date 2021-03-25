@@ -52,8 +52,8 @@ public class Parser implements IParser {
                     ls = new LineStatement();
                     break;
                 case DIRECTIVE:
-                    Directive dr = new Directive(position, value);
-                    dr.setStringOperand(value);
+                    Directive dr = new Directive(position);
+                    dr.setDirective(value);
                     ls.setDirective(dr);
                     break;
                 case STRING_OPERAND:

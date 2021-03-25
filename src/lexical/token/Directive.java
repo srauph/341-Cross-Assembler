@@ -4,8 +4,8 @@ public class Directive extends Token {
     private String directive;
     private String stringOperand;
 
-    public Directive(Position pos, String name) {
-        super(pos, name, TokenType.DIRECTIVE);
+    public Directive(Position pos) {
+        super(pos, "", TokenType.DIRECTIVE);
     }
 
     public String getDirective() {
