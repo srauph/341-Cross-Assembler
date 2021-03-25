@@ -17,6 +17,6 @@ public class TestComment {
     @Test
     void Should_Create_Comment_equalTo_test_comment(){
         String result = c1.toString();
-        Assertions.assertEquals("Comment{test comment}",result.toString());
+        Assertions.assertEquals("Comment{test comment}",result);
     }
 }
