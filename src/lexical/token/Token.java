@@ -27,6 +27,7 @@ public class Token implements IToken {
         return type;
     }
 
+
     public void setType(TokenType type) {
         this.type = type;
     }

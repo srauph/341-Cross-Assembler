@@ -9,6 +9,8 @@ public class TestTokenClass {
     Token t1 = new Token (new Position(1,2),"halt", TokenType.MNEMONIC);
     Token t2 = new Token(new Position(2,4),"pop", TokenType.MNEMONIC);
     Token t3 = new Token(new Position(3,6),"dup", TokenType.MNEMONIC);
+
+
     @Test
     void Should_Create_Halt_1_2_EqualTo_Mnemonic() {
         String result = t1.getValue()+"("+t1.getPosition().getLineNumber()+","+t1.getPosition().getColumnNumber()+")="+TokenType.MNEMONIC;
@@ -26,4 +28,6 @@ public class TestTokenClass {
         String result = t3.getValue()+"("+t3.getPosition().getLineNumber()+","+t3.getPosition().getColumnNumber()+")="+TokenType.MNEMONIC;
         Assertions.assertEquals("dup(3,6)=MNEMONIC",result);
     }
+
+
 }
