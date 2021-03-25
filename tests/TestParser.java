@@ -12,7 +12,7 @@ public class TestParser {
     ErrorReporter errorReporter = new ErrorReporter("TestParser");
 
     @Test
-    void Should_Return_True_If_No_Errors_Detected() {
+    void Should_Pass_If_Output_Is_Same_As_Expected() {
 
         Token[] tokenArray = {t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24};
         Parser parse = new Parser(scanner, scanner.getKeywords(), errorReporter, true);
@@ -22,7 +22,8 @@ public class TestParser {
                 parse.parseTokens();
             }
         }
-        Assertions.assertFalse(errorReporter.hasErrors());
+        String expectedOutPut = "IntermediateRep{intermediateRep=[LineStatement{instruction=null, comment=Comment{; TestImmediate.asm - Test immediate instructions.}, directive=null}, LineStatement{instruction=null, comment=null, directive=null}, LineStatement{instruction=Instruction{mnemonic=Mnemonic{opCode=128, name=enter.u5}, operand=Operand{operand=0}}, comment=Comment{; OK, number <u5> [0..31].}, directive=null}, LineStatement{instruction=Instruction{mnemonic=Mnemonic{opCode=145, name=ldc.i3}, operand=Operand{operand=1}}, comment=Comment{; OK, number <i3> [-4..3].}, directive=null}, LineStatement{instruction=Instruction{mnemonic=Mnemonic{opCode=158, name=addv.u3}, operand=Operand{operand=6}}, comment=Comment{; OK, number <u3> [0..7].}, directive=null}, LineStatement{instruction=Instruction{mnemonic=Mnemonic{opCode=163, name=ldv.u3}, operand=Operand{operand=3}}, comment=Comment{; OK, number <u3> [0..7].}, directive=null}, LineStatement{instruction=Instruction{mnemonic=Mnemonic{opCode=173, name=stv.u3}, operand=Operand{operand=5}}, comment=Comment{; OK, number <u3> [0..7].}, directive=null}, LineStatement{instruction=null, comment=null, directive=null}]}";
+        Assertions.assertEquals(parse.getIR().toString(), expectedOutPut);
     }
 
     Token t1 = new Token(new Position(1, 1), "; TestImmediate.asm - Test immediate instructions.", TokenType.COMMENT);
