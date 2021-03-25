@@ -22,8 +22,7 @@ public class TestErrorReporter {
                 parse.parseTokens();
             }
         }
-        errorReporter.checkReports();
-        Assertions.assertFalse(errorReporter.hasErrors());
+        Assertions.assertTrue(errorReporter.hasErrors());
     }
 
     Token t1 = new Token(new Position(1, 1), "ldc.i3", TokenType.MNEMONIC);

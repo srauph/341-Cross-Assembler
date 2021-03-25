@@ -22,7 +22,6 @@ public class TestParser {
                 parse.parseTokens();
             }
         }
-        errorReporter.checkReports();
         Assertions.assertFalse(errorReporter.hasErrors());
     }
 
