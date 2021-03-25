@@ -119,7 +119,7 @@ public class Parser implements IParser {
                     ErrorMsg unknown_token = new ErrorMsg("Unknown token", nextToken.getPosition());
                     errorReporter.record(unknown_token);
             }
-            if (isTesting) {
+            if (isTesting){
                 return;
             }
             //Get the next token to process

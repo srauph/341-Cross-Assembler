@@ -30,7 +30,7 @@ public class CodeGenerator {
     public void generateListing() {
         StringBuilder lst = new StringBuilder();
         // Chunky: Changed the line to more closely match the prof's example.
-        lst.append("Line Addr Machine Code          Label         Assembly Code            Comments\r\n\r\n");
+        lst.append("Line Addr Code          Label         Mne         Operand             Comments\r\n");
         int linePosition = 1;
         int addr = 0;
         for (LineStatement ls : ir.getStatements()) {
@@ -66,7 +66,7 @@ public class CodeGenerator {
 
             //End Generating Opening of line statement
 
-            lst.append(StringUtils.getCustomFormat(19, " ")); // Padding between Code and Mne
+            lst.append(StringUtils.getCustomFormat(10, " ")); // Padding between Code and Mne
             //Begin Generating Closing of line statement
             //Label
             lst.append(StringUtils.getCustomFormat(5, " "));

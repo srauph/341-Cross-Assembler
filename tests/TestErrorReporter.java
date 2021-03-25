@@ -9,7 +9,7 @@ import parser.Parser;
 
 public class TestErrorReporter {
     LexicalScanner scanner = new LexicalScanner();
-    ErrorReporter errorReporter = new ErrorReporter("TestParser");
+    ErrorReporter errorReporter = new ErrorReporter("TestErrorReporter");
 
     @Test
     void Should_Return_True_If_No_Errors_Detected() {
