@@ -2,7 +2,7 @@ import lexical.token.Position;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class TestPositionClass {
+public class TestPosition {
 
     Position p1 = new Position(1,2);
     Position p2 = new Position(2,4);
