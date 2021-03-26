@@ -10,7 +10,7 @@ import utils.SymbolTable;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class CodeGenerator {
+public class CodeGenerator implements ICodeGenerator {
     private final IntermediateRep ir;
     private final LexicalScanner lexicalScanner;
     // Shu: Idk but i needed to change it to Mnemonic for the shebang to work.

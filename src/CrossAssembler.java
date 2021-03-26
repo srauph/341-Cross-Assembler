@@ -1,6 +1,6 @@
 import lexical.LexicalScanner;
 
-public class Main {
+public class CrossAssembler {
 
     public static void main(String[] args) {
         //Reads filename and arguments
