@@ -96,4 +96,8 @@ public class CodeGenerator implements ICodeGenerator {
             e.printStackTrace();
         }
     }
+
+    public void generateExecutable() {
+
+    }
 }
