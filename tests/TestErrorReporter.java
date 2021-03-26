@@ -37,6 +37,5 @@ public class TestErrorReporter {
     Token t8 = new Token(new Position(3, 1), "top", TokenType.MNEMONIC);
     Token t9 = new Token(new Position(3, 2), "; Not a valid mnemonic or directive.", TokenType.COMMENT);
     Token t10 = new Token(new Position(3, 3), "EOF", TokenType.EOF);
-
 }
 

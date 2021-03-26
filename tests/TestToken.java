@@ -19,7 +19,7 @@ public class TestToken {
     }
 
     @Test
-    void Should_Create_I3_2_4_EqualTo_Operand() {
+    void Should_Create_TestOperand_2_4_EqualTo_Operand() {
         String result = t2.getValue()+"("+t2.getPosition().getLineNumber()+","+t2.getPosition().getColumnNumber()+")="+TokenType.OPERAND;
         Assertions.assertEquals("<i3>(2,4)=OPERAND",result);
     }
@@ -37,7 +37,7 @@ public class TestToken {
     }
 
     @Test
-    void Should_Create_Comment_5_10_EqualTo_Comment() {
+    void Should_Create_TestComment_5_10_EqualTo_Comment() {
         String result = t5.getValue() + "(" + t5.getPosition().getLineNumber() + "," + t5.getPosition().getColumnNumber() + ")=" + TokenType.COMMENT;
         Assertions.assertEquals("; OK, number <u5> [0..31].(5,10)=COMMENT", result);
     }

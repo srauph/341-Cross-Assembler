@@ -55,5 +55,4 @@ public class TestPosition {
         int result = p4.getColumnNumber();
         Assertions.assertEquals(255,result);
     }
-
 }

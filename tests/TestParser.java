@@ -57,6 +57,5 @@ public class TestParser {
     Token t22 = new Token(new Position(7, 3), "; OK, number <u3> [0..7].", TokenType.COMMENT);
     Token t23 = new Token(new Position(7, 4), "EOL", TokenType.EOL);
     Token t24 = new Token(new Position(8, 1), "EOF", TokenType.EOF);
-
 }
 
