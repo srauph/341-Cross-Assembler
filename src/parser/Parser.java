@@ -79,7 +79,7 @@ public class Parser implements IParser {
                         //Set newly created instruction's mnemonic
                         ls.getInstruction().setMnemonic(new Mnemonic(position, value));
                         ls.getInstruction().getMnemonic().setMode(mnemonic.getMode());
-                        // Chunky: Added this line
+                        // Shu: Added this line
                         ls.getInstruction().getMnemonic().setOpCode(keywords.get(value).getOpCode());
                     } else {
                         ErrorMsg errorMsg = new ErrorMsg("Invalid mnemonic or directive.", position);
@@ -88,8 +88,8 @@ public class Parser implements IParser {
                     break;
                 case OPERAND:
                     //System.out.println("[Debug] - " + nextToken);
-                    // Chunky: Code to figure out how much to ass to the opcode to make it match the table the prof gave.
-                    // Chunky: TLDR: base from keywords + operand + offset to account for bit shifts = opcode
+                    // Shu: Code to figure out how much to ass to the opcode to make it match the table the prof gave.
+                    // Shu: TLDR: base from keywords + operand + offset to account for bit shifts = opcode
                     Mnemonic mne = ls.getInstruction().getMnemonic();
                     int opc = Integer.parseInt(value);
                     try {
