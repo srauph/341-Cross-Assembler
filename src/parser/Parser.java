@@ -62,6 +62,7 @@ public class Parser implements IParser {
                     break;
                 case LABEL:
                     Label lb = new Label(position, value);
+
                     //Create label for mnemonic
                     if (ls.getLabel() == null &&  inst != null && inst.getMnemonic() != null) {
                         if (inst.getMnemonic().getMode().equals("relative")) {
@@ -153,12 +154,18 @@ public class Parser implements IParser {
         ErrorMsg errorMsg = new ErrorMsg();
         Token token = nextToken;
 
-        if (ls.getInstruction() != null) {//if no instruction then we assume its a line with only a comment and ignore it
+        //if no instruction then we assume its a line with only a comment and ignore it
+        if (ls.getInstruction() != null) {
             if (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null) {
-                if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("immediate") && ls.getInstruction().getOperand() == null) { //If instruction in not inherent (immediate or relative) but does not have an operand
+
+                //If instruction in not inherent (immediate or relative) but does not have an operand
+                if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("immediate") && ls.getInstruction().getOperand() == null) {
                     errorMsg.setMessage("Instruction requires an operand.");
-                } else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null) { //If instruction is inherent but contains an operand
+
+                    //If instruction is inherent but contains an operand
+                } else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null) {
                     errorMsg.setMessage("Inherent instruction must not have an operand.");
+
                 } else {
                     String msg = checkInvalidOperand(ls);
                     if (!msg.equals("")) {
@@ -176,7 +183,7 @@ public class Parser implements IParser {
     private String checkInvalidOperand(LineStatement ls) {
         String errorMessage = "";
         String suffix = getSuffix(ls.getInstruction().getValue());
-        int opCode = Integer.parseInt(ls.getInstruction().getOperand().getValue());
+        long opCode = Long.parseLong(ls.getInstruction().getOperand().getValue());
         String mnemonic = ls.getInstruction().getMnemonic().getValue();
 
         if (suffix != null) {
@@ -184,52 +191,52 @@ public class Parser implements IParser {
 
                 case "u3":
                     if (opCode < 0 || opCode > 7) {
-                        errorMessage = "Operand number not in an u3 range [0..+7].";
+                        errorMessage = "The instruction " + mnemonic + "'s operand number not in an u3 range [0..+7].";
                     }
                     break;
                 case "i3":
                     if (opCode < -4 || opCode > 3) {
-                        errorMessage = "Operand number not in an i3 range [-4..+3].";
+                        errorMessage = "The instruction " + mnemonic + "'s operand number not in an i3 range [-4..+3].";
                     }
                     break;
                 case "u5":
                     if (opCode < 0 || opCode > 31) {
-                        errorMessage = "Operand number not in an u5 range [0..+31].";
+                        errorMessage = "The instruction " + mnemonic + "'s operand number not in an u5 range [0..+31].";
                     }
                     break;
                 case "i5":
                     if (opCode < -16 || opCode > 15) {
-                        errorMessage = "Operand number not in an i5 range [-16..+15].";
+                        errorMessage = "The instruction " + mnemonic + "'s operand not in an i5 range [-16..+15].";
                     }
                     break;
                 case "i8":
                     if (opCode < -128 || opCode > 128) {
-                        errorMessage = "Operand number not in an i8 range [-128..+127].";
+                        errorMessage = "The instruction " + mnemonic + "'s operand number not in an i8 range [-128..+127].";
                     }
                     break;
                 case "u8":
                     if (opCode < 0 || opCode > 255) {
-                        errorMessage = "Operand number not in an u8 range [0..+255].";
+                        errorMessage = "The instruction " + mnemonic + "'s operand number not in an u8 range [0..+255].";
                     }
                     break;
                 case "i16":
                     if (opCode < -32768 || opCode > 32767) {
-                        errorMessage = "Operand number not in an i16 range [-32768..+32767].";
+                        errorMessage = "The instruction " + mnemonic + "'s operand number not in an i16 range [-32768..+32767].";
                     }
                     break;
                 case "u16":
                     if (opCode < -0 || opCode > 65535) {
-                        errorMessage = "Operand number not in an u16 range [0..+65535].";
+                        errorMessage = "The instruction " + mnemonic + "'s operand number not in an u16 range [0..+65535].";
                     }
                     break;
                 case "u32":
                     if (opCode < 0 || opCode > 4294967295L) {
-                        errorMessage = "Operand number not in an u32 range [0..+4294967295].";
+                        errorMessage = "The instruction " + mnemonic + "'s operand number not in an u32 range [0..+4294967295].";
                     }
                     break;
                 case "i32":
                     if (opCode < -2147483648 || opCode > 2147483647L) {
-                        errorMessage = "Operand number not in an i32 range [-2147483648..+2147483647].";
+                        errorMessage = "The instruction " + mnemonic + "'s operand number not in an i32 range [-2147483648..+2147483647].";
                     }
                     break;
             }
