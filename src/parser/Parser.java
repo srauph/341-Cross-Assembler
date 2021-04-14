@@ -52,7 +52,7 @@ public class Parser implements IParser {
                 case EOF:
                 case EOL:
                     //Error Reporting
-                    //errorReporting(ls);
+                    errorReporting(ls);
 
                     ir.add(ls);
                     ls = new LineStatement();
@@ -179,22 +179,55 @@ public class Parser implements IParser {
 
         if (suffix != null) {
             switch (suffix) {
-                case "u5":
-                    if (opCode < 0 || opCode > 31) {
-                        errorMessage = "The immediate instruction \'" + mnemonic +
-                                "\' must have a 5-bit unsigned operand number ranging from 0 to 31.";
-                    }
-                    break;
+
                 case "u3":
                     if (opCode < 0 || opCode > 7) {
-                        errorMessage = "The immediate instruction \'" + mnemonic +
-                                "\' must have a 3-bit unsigned operand number ranging from 0 to 7.";
+                        errorMessage = "Operand number not in an u3 range [0..+7].";
                     }
                     break;
                 case "i3":
                     if (opCode < -4 || opCode > 3) {
-                        errorMessage = "The immediate instruction \'" + mnemonic +
-                                "\' must have a 3-bit unsigned operand number ranging from -4 to 3.";
+                        errorMessage = "Operand number not in an i3 range [-4..+3].";
+                    }
+                    break;
+                case "u5":
+                    if (opCode < 0 || opCode > 31) {
+                        errorMessage = "Operand number not in an u5 range [0..+31].";
+                    }
+                    break;
+                case "i5":
+                    if (opCode < -16 || opCode > 15) {
+                        errorMessage = "Operand number not in an i5 range [-16..+15].";
+                    }
+                    break;
+                case "i8":
+                    if (opCode < -128 || opCode > 128) {
+                        errorMessage = "Operand number not in an i8 range [-128..+127].";
+                    }
+                    break;
+                case "u8":
+                    if (opCode < 0 || opCode > 255) {
+                        errorMessage = "Operand number not in an u8 range [0..+255].";
+                    }
+                    break;
+                case "i16":
+                    if (opCode < -32768 || opCode > 32767) {
+                        errorMessage = "Operand number not in an i16 range [-32768..+32767].";
+                    }
+                    break;
+                case "u16":
+                    if (opCode < -0 || opCode > 65535) {
+                        errorMessage = "Operand number not in an u16 range [0..+65535].";
+                    }
+                    break;
+                case "u32":
+                    if (opCode < 0 || opCode > 4294967295L) {
+                        errorMessage = "Operand number not in an u32 range [0..+4294967295].";
+                    }
+                    break;
+                case "i32":
+                    if (opCode < -2147483648 || opCode > 2147483647L) {
+                        errorMessage = "Operand number not in an i32 range [-2147483648..+2147483647].";
                     }
                     break;
             }
