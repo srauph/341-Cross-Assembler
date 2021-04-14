@@ -51,8 +51,19 @@ public class Parser implements IParser {
                 //Depending on how the input file is made, if does not end with an EOL, it will end with an EOF
                 case EOF:
                 case EOL:
-                    //Error Reporting
-                    errorReporting(ls);
+                    /**
+                     * (certain) : i put error reporting for when an instruction doesnt have an operand here because i couldnt figure
+                     * out how to do it from "case:MNEMONIC" as i would need to do lexicalScanner.getNextToken and that messes
+                     * things up. lmk if u know a different way
+                     */
+                    // Error reporting for when an instruction (immediate or relative) does not have an operand
+                    // If there is no instruction, then we assume it's a line with only a comment and ignore it
+                    if((ls.getInstruction() != null) && (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null)) {
+                        if (!keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() == null) {
+                            ErrorMsg errorMsg = new ErrorMsg("Instruction requires an operand.", nextToken.getPosition());
+                            errorReporter.record(errorMsg);
+                        }
+                    }
 
                     ir.add(ls);
                     ls = new LineStatement();
@@ -86,6 +97,7 @@ public class Parser implements IParser {
                     break;
                 case MNEMONIC:          //If token is a mnemonic
                     Mnemonic mnemonic = keywords.get(value);
+
                     if (mnemonic != null) {
                         ls.setInstruction(new Instruction(position, value)); // Set instruction
                         //Set newly created instruction's mnemonic
@@ -102,6 +114,31 @@ public class Parser implements IParser {
                     //System.out.println("[Debug] - " + nextToken);
                     // Shu: Code to figure out how much to ass to the opcode to make it match the table the prof gave.
                     // Shu: TLDR: base from keywords + operand + offset to account for bit shifts = opcode
+
+
+                    // Operand error reporting
+                    String message = checkInvalidOperand(ls, nextToken.getValue());
+                    if(!message.equals("")){
+                        ErrorMsg errorMsg = new ErrorMsg(message, nextToken.getPosition());
+                        errorReporter.record(errorMsg);
+                    }
+
+                    // Checking if inherent instruction has an operand
+                    else if(keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && nextToken.getValue() != null){
+                        ErrorMsg errorMsg = new ErrorMsg("Inherent instruction must not have an operand", nextToken.getPosition());
+                        errorReporter.record(errorMsg);
+                    }
+
+                    /*
+                    // Checking if immediate or relative instruction does not have an operand
+                    else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("immediate") && nextToken.getValue() == null) {
+                        System.out.println("here2");
+                        ErrorMsg errorMsg = new ErrorMsg("Instruction requires an operand.", nextToken.getPosition());
+                        errorReporter.record(errorMsg);
+                    }
+
+                     */
+
                     Mnemonic mne = ls.getInstruction().getMnemonic();
                     int opc = Integer.parseInt(value);
                     try {
@@ -143,45 +180,10 @@ public class Parser implements IParser {
         return this.ir;
     }
 
-    /**
-     * Analyzes line statements and report error if one is found.
-     *
-     * @param ls
-     */
-    private void errorReporting(LineStatement ls) {
-        ErrorMsg errorMsg = new ErrorMsg();
-        Token token = nextToken;
-
-        //if no instruction then we assume its a line with only a comment and ignore it
-        if (ls.getInstruction() != null) {
-            if (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null) {
-
-                //If instruction in not inherent (immediate or relative) but does not have an operand
-                if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("immediate") && ls.getInstruction().getOperand() == null) {
-                    errorMsg.setMessage("Instruction requires an operand.");
-
-                    //If instruction is inherent but contains an operand
-                } else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() != null) {
-                    errorMsg.setMessage("Inherent instruction must not have an operand.");
-
-                } else {
-                    String msg = checkInvalidOperand(ls);
-                    if (!msg.equals("")) {
-                        errorMsg.setMessage(msg);
-                    }
-                }
-            }
-            if (!errorMsg.getMessage().isEmpty()) {
-                errorMsg.setPosition(token.getPosition());
-                this.errorReporter.record(errorMsg);
-            }
-        }
-    }
-
-    private String checkInvalidOperand(LineStatement ls) {
+    private String checkInvalidOperand(LineStatement ls, String value) {
         String errorMessage = "";
         String suffix = getSuffix(ls.getInstruction().getValue());
-        long opCode = Long.parseLong(ls.getInstruction().getOperand().getValue());
+        long opCode = Long.parseLong(value);
         String mnemonic = ls.getInstruction().getMnemonic().getValue();
 
         if (suffix != null) {
