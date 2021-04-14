@@ -24,6 +24,11 @@ public class Mnemonic extends Token {
         this.mode = mode;
     }
 
+    public Mnemonic(String value, String mode) {
+        super(null, value, TokenType.MNEMONIC);
+        this.mode = mode;
+    }
+
     public int getOpCode() {
         return opCode;
     }
@@ -40,7 +45,7 @@ public class Mnemonic extends Token {
         this.size = size;
     }
 
-    public String getMode(){
+    public String getMode() {
         return mode;
     }
 

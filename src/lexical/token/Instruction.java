@@ -5,8 +5,8 @@ package lexical.token;
  */
 public class Instruction extends Token {
 
-    private Mnemonic mnemonic;
-    private Operand operand;
+    private Mnemonic mnemonic = null;
+    private Operand operand = null;
 
     public Instruction(Position pos, String name) {
         super(pos, name, TokenType.INSTRUCTION);

@@ -51,7 +51,6 @@ public class CodeGenerator implements ICodeGenerator {
             }
 
             //Machine Code
-            // Shu: Code breaks if it's null. I'm not fully sure why because 7am brain. Maybe i'll figure it out in the morn.
             if (ls.getInstruction() != null) {
                 Mnemonic mne = keyword.get(ls.getInstruction().getMnemonic().getValue());
                 lst.append(StringUtils.getCustomFormat(
@@ -68,13 +67,16 @@ public class CodeGenerator implements ICodeGenerator {
             lst.append(StringUtils.getCustomFormat(10, " ")); // Padding between Code and Mne
             //Begin Generating Closing of line statement
             //Label
-            lst.append(StringUtils.getCustomFormat(5, " "));
+            lst.append(StringUtils.getCustomFormat(5, ls.getLabel() == null ? " " : ls.getLabel().getLabel()));
 
             lst.append(StringUtils.getCustomFormat(9, " "));// Padding between Label and Mne
             //Mne
             // Shu: Code breaks if it's null. I'm not fully sure why because 7am brain. Maybe i'll figure it out in the morn.
             // Shu: Oh also added operand here because we need it now.
-            if (ls.getInstruction() != null && ls.getInstruction().getOperand() != null) {
+            if (ls.getDirective() != null) {
+                lst.append(StringUtils.getCustomFormat(10, ls.getDirective().getDirective()));
+                lst.append(StringUtils.getCustomFormat(14, ls.getDirective().getStringOperand()));
+            } else if (ls.getInstruction() != null && ls.getInstruction().getOperand() != null) {
                 lst.append(StringUtils.getCustomFormat(10, ls.getInstruction().getMnemonic().getValue()));
                 lst.append(StringUtils.getCustomFormat(14, ls.getInstruction().getOperand().getValue()));
             }

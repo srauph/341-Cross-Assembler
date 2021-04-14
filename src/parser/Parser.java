@@ -45,18 +45,31 @@ public class Parser implements IParser {
             TokenType type = nextToken.getType();
             Position position = nextToken.getPosition();
             String value = nextToken.getValue();
+            Instruction inst = ls.getInstruction();
             switch (type) {
                 //If token is EOL, LS is finished, add it to IR and start a new one.
                 //Depending on how the input file is made, if does not end with an EOL, it will end with an EOF
                 case EOF:
                 case EOL:
                     //Error Reporting
-                    errorReporting(ls);
+                    //errorReporting(ls);
 
                     ir.add(ls);
                     ls = new LineStatement();
                     if (nextToken.getType() == TokenType.EOF) {
                         return;
+                    }
+                    break;
+                case LABEL:
+                    Label lb = new Label(position, value);
+                    //Create label for mnemonic
+                    if (ls.getLabel() == null &&  inst != null && inst.getMnemonic() != null) {
+                        if (inst.getMnemonic().getMode().equals("relative")) {
+                            inst.setOperand(new Operand(position, value));
+                            inst.getOperand().setLabel(lb);
+                        }
+                    } else { // else it is an instruction label
+                        ls.setLabel(lb);
                     }
                     break;
                 case DIRECTIVE:
@@ -119,7 +132,7 @@ public class Parser implements IParser {
                     ErrorMsg unknown_token = new ErrorMsg("Unknown token", nextToken.getPosition());
                     errorReporter.record(unknown_token);
             }
-            if (isTesting){
+            if (isTesting) {
                 return;
             }
             //Get the next token to process

@@ -3,9 +3,10 @@ package ir;
 import lexical.token.Comment;
 import lexical.token.Directive;
 import lexical.token.Instruction;
+import lexical.token.Label;
 
 public class LineStatement {
-    //Label
+    private Label label = null;
     //Either instruction OR directive, cant have both for 1 line
     private Instruction instruction;
     private Directive directive;
@@ -38,12 +39,21 @@ public class LineStatement {
         this.directive = directive;
     }
 
+    public Label getLabel() {
+        return label;
+    }
+
+    public void setLabel(Label label) {
+        this.label = label;
+    }
+
     @Override
     public String toString() {
         return "LineStatement{" +
-                "instruction=" + instruction +
-                ", comment=" + comment +
+                "label=" + label +
+                ", instruction=" + instruction +
                 ", directive=" + directive +
+                ", comment=" + comment +
                 '}';
     }
 }

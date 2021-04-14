@@ -73,12 +73,21 @@ public class LexicalScanner implements ILexicalScanner {
         keywords.put("tgt", new Mnemonic("tgt", 0x1D, "inherent"));
         keywords.put("tle", new Mnemonic("tle", 0x1E, "inherent"));
         keywords.put("tge", new Mnemonic("tge", 0x1F, "inherent"));
+
+        keywords.put(".cstring", new Mnemonic(".cstring", "directive"));
+
         keywords.put("enter.u5", new Mnemonic("enter.u5", 0x70, "immediate"));
         keywords.put("ldc.i3", new Mnemonic("ldc.i3", 0x90, "immediate"));
         keywords.put("addv.u3", new Mnemonic("addv.u3", 0x98, "immediate"));
         keywords.put("ldv.u3", new Mnemonic("ldv.u3", 0xA0, "immediate"));
         keywords.put("stv.u3", new Mnemonic("stv.u3", 0xA8, "immediate"));
-        //Will add the rest when we get to there
+
+        keywords.put("br.i8", new Mnemonic("br.i8", 0xE0, "relative"));
+        keywords.put("brf.i8", new Mnemonic("brf.i8", 0xE3, "relative"));
+        keywords.put("ldc.i8", new Mnemonic("ldc.i8", 0xD9, "relative"));
+        keywords.put("ldv.u8", new Mnemonic("ldv.u8", 0xB1, "relative"));
+        keywords.put("stv.u8", new Mnemonic("stv.u8", 0xB2, "relative"));
+        keywords.put("lda.i16", new Mnemonic("lda.i16", 0xD5, "relative"));
     }
 
     /**
@@ -98,7 +107,9 @@ public class LexicalScanner implements ILexicalScanner {
             c = readChar();
         }
         //label
-
+        if (Character.isUpperCase(c)) {
+            return readLabel(c, sb);
+        }
 
         //Directive
         if (StringUtils.isPeriod((char) c)) {
@@ -135,7 +146,7 @@ public class LexicalScanner implements ILexicalScanner {
 
         //Check EOF
         if (StringUtils.isEOF(c)) {
-            errorReporter.checkReports();
+            //  errorReporter.checkReports();
             //Check if any errors for scanner exist and if so, print and terminate?
             return new Token(new Position(lineNumber, 0), "EOF", TokenType.EOF);
         }
@@ -159,6 +170,25 @@ public class LexicalScanner implements ILexicalScanner {
         }
         return new Token(pos, sb.toString(), TokenType.STRING_OPERAND);
     }
+
+    /**
+     * Reads labels and returns the token.
+     *
+     * @param c
+     * @param sb
+     * @return
+     */
+    private Token readLabel(int c, StringBuilder sb) {
+        Position pos = new Position(lineNumber, ++columnNumber);
+        while (!StringUtils.isIgnoredCharacter(c) && !StringUtils.isEOF(c)) {
+            validateCharacter(c, pos);
+            //continue reading each character
+            sb.append((char) c);
+            c = readChar();
+        }
+        return new Token(pos, sb.toString(), TokenType.LABEL);
+    }
+
 
     /**
      * Reads directive.
