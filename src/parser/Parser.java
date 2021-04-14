@@ -63,11 +63,9 @@ public class Parser implements IParser {
                 case LABEL:
                     Label lb = new Label(position, value);
                     //Create label for mnemonic
-                    if (ls.getLabel() == null &&  inst != null && inst.getMnemonic() != null) {
-                        if (inst.getMnemonic().getMode().equals("relative")) {
-                            inst.setOperand(new Operand(position, value));
-                            inst.getOperand().setLabel(lb);
-                        }
+                    if (inst != null && inst.getMnemonic() != null) {
+                        inst.setOperand(new Operand(position, value));
+                        inst.getOperand().setLabel(lb);
                     } else { // else it is an instruction label
                         ls.setLabel(lb);
                     }
@@ -95,7 +93,7 @@ public class Parser implements IParser {
                         // Shu: Added this line
                         ls.getInstruction().getMnemonic().setOpCode(keywords.get(value).getOpCode());
                     } else {
-                        ErrorMsg errorMsg = new ErrorMsg("Invalid mnemonic or directive.", position);
+                        ErrorMsg errorMsg = new ErrorMsg("Invalid mnemonic.", position);
                         this.errorReporter.record(errorMsg);
                     }
                     break;
