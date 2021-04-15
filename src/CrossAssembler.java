@@ -20,6 +20,6 @@ public class CrossAssembler {
         CodeGenerator codeGen = new CodeGenerator(lexicalScanner, lexicalScanner.getKeywords(), options.getFileName(), parser.getIR());
         codeGen.generateListing();
 
-        System.out.println("Done creating TestImmediate.lst file.");
+        System.out.println("Done creating "+options.getFileName()+".lst file.");
     }
 }
