@@ -17,17 +17,19 @@ public class Parser implements IParser {
     private final IErrorReporter errorReporter;
     private boolean isTesting = false;
     private LineStatement ls = new LineStatement();
+    private boolean verbose = false;
 
-    public Parser(LexicalScanner lexicalScanner, SymbolTable<String, Mnemonic> keywords, IErrorReporter errorRep) {
-        this(lexicalScanner, keywords, errorRep, false);
+    public Parser(LexicalScanner lexicalScanner, SymbolTable<String, Mnemonic> keywords, boolean verbose, IErrorReporter errorRep) {
+        this(lexicalScanner, keywords, verbose, errorRep, false);
     }
 
-    public Parser(LexicalScanner lexicalScanner, SymbolTable<String, Mnemonic> keywords, IErrorReporter errorRep, boolean isTesting) {
+    public Parser(LexicalScanner lexicalScanner, SymbolTable<String, Mnemonic> keywords, boolean verbose, IErrorReporter errorRep, boolean isTesting) {
         this.isTesting = isTesting;
         this.lexicalScanner = lexicalScanner;
         this.keywords = keywords;
         this.getNextToken();
         this.errorReporter = errorRep;
+        this.verbose = verbose;
     }
 
     /**
@@ -41,6 +43,9 @@ public class Parser implements IParser {
      * LineStatement = [ Label ] [ Instruction | Directive ] [ Comment ] EOL .
      */
     public void parseTokens() {
+        if (verbose){
+            System.out.println("Parsing tokens.\n");
+        }
         while (true) {
             TokenType type = nextToken.getType();
             Position position = nextToken.getPosition();
@@ -57,6 +62,8 @@ public class Parser implements IParser {
                     ir.add(ls);
                     ls = new LineStatement();
                     if (nextToken.getType() == TokenType.EOF) {
+                        if (verbose)
+                            System.out.println("Tokens Sucessfully parsed.\n");
                         return;
                     }
                     break;
