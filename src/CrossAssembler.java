@@ -13,7 +13,7 @@ public class CrossAssembler {
         ErrorReporter errorReporter = new ErrorReporter(options);
         Parser parser = new Parser(lexicalScanner, lexicalScanner.getKeywords(), errorReporter);
         parser.parseTokens();
-     //   errorReporter.checkReports();
+        errorReporter.checkReports();
 
         //Copy over the (IR?) sequential list of line statements to be processed
         //TODO: Uncomment after parser is fixed for sprint 3 <-- Uncommented! :D
