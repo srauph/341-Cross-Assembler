@@ -70,17 +70,6 @@ public class Options {
                 banner = true;
             }
 
-            //Debug
-            /*System.out.println("All Arguments:");
-            for (int q = 0;q<args.length;q++){
-                System.out.println(q + ": " + args[q]);
-            }
-            System.out.println("");
-            System.out.println("Help: " + help);
-            System.out.println("Verbose: " + verbose);
-            System.out.println("Banner: " + banner);
-            System.out.println("Listing: " + listing);*/
-
             if (help){
                 System.out.println("Usage: CrossAssembler [options] <file>.asm\n\n" + 
                     "Options:\n\n" + 
@@ -98,22 +87,16 @@ public class Options {
                     throw new Exception("No File Specified");
                 } else {
 
-                    /*String[] validOptions = {"-h","-help","-l","listing","-v","-verbose","-b","-banner"};
-                    boolean last = false;
-                    for (int k = 0;k<validOptions.length;k++){
-                        if (args[i].equals(validOptions[k]))
-                            last = true;
-                    }
-                    if (!last){
-                        throw new Exception("Invalid Option " + args[i] + ". Use the -h option to display a list of options.");
-                    }*/
-
                     File f = new File(args[i]);
                     if (!(f.exists() && !f.isDirectory())) {
                         throw new Exception("File " + args[i] + " not found");
                     } else {
-                        inputfile = args[i];
-                        filename = inputfile.replace(".asm", "");
+                        if(args[i].length() > 4 && args[i].substring(args[i].length()-4,args[i].length()).equals(".asm")){
+                            inputfile = args[i];
+                            filename = inputfile.replace(".asm", "");
+                        }else{
+                            throw new Exception("Invalid file type. Must be an .asm file.");
+                        }
                     }
                 }
             }
