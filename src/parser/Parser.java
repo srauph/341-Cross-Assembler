@@ -87,7 +87,7 @@ public class Parser implements IParser {
                         labelValidator.addOperandLabel(lb);
                     } else { // else it is an instruction label
                         ls.setLabel(lb);
-                        labelValidator.addInstructionLabel(lb, errorReporter);
+                        labelValidator.instructionLabelErrorReporting(lb, errorReporter);
                     }
                     break;
                 case DIRECTIVE:
@@ -167,7 +167,7 @@ public class Parser implements IParser {
      *
      */
     private void operandLabelErrorReporting() {
-        labelValidator.checkIfDefined(errorReporter);
+        labelValidator.operandLabelErrorReporting(errorReporter);
     }
 
     /**

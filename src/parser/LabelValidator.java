@@ -28,7 +28,7 @@ public class LabelValidator implements ILabelValidator {
      * @param label
      * @param errorReporter
      */
-    public void addInstructionLabel(Label label, IErrorReporter errorReporter) {
+    public void instructionLabelErrorReporting(Label label, IErrorReporter errorReporter) {
         if (instructionLabel.contains(label.getLabel())) {
             ErrorMsg errorMsg = new ErrorMsg(label.getLabel() + " label already defined.", label.getPosition());
             errorReporter.record(errorMsg);
@@ -42,7 +42,7 @@ public class LabelValidator implements ILabelValidator {
      *
      * @param errorReporter
      */
-    public void checkIfDefined(IErrorReporter errorReporter) {
+    public void operandLabelErrorReporting(IErrorReporter errorReporter) {
         for (Label operandLabel : operandLabel) {
             if (operandLabel != null && !instructionLabel.contains(operandLabel.getLabel())) {
                 ErrorMsg errorMsg = new ErrorMsg(operandLabel.getLabel() + " label not found (or defined).", operandLabel.getPosition());
