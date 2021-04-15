@@ -59,6 +59,10 @@ public class Parser implements IParser {
                     // Error reporting for when an instruction (immediate or relative) does not have an operand
                     instructionErrorReporting(ls, nextToken);
 
+                    // Relative instruction error reporting
+                    relativeInstructionErrorReporting(ls, nextToken);
+
+
                     ir.add(ls);
                     ls = new LineStatement();
                     if (nextToken.getType() == TokenType.EOF) {
@@ -150,16 +154,57 @@ public class Parser implements IParser {
         }
     }
 
+    /**
+     * Records an error to the error reporter if a relative instruction does not refer to a label (except ldc.18, ldc.i16 and ldc.i32)
+     *
+     * @param ls
+     * @param nextToken
+     */
+    private void relativeInstructionErrorReporting(LineStatement ls, Token nextToken) {
+        // If there is no instruction, then we assume it's a line with only a comment and ignore it
+        if(ls.getInstruction() != null) {
+
+            // Extracting mnemonic name to check if it's not ldc.18, ldc.i16 or ldc.i32
+            String[] mnemonicValue = ls.getInstruction().getMnemonic().getValue().split("\\.");
+            if(mnemonicValue.length > 0) {
+                if((ls.getInstruction() != null) && (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null)
+                    && !(mnemonicValue[0].equals("ldc"))) {
+                    if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("relative") &&
+                            (ls.getInstruction().getOperand().getLabel() == null)) {
+                        ErrorMsg errorMsg = new ErrorMsg("Relative instruction operand must refer to a label.", nextToken.getPosition());
+                        errorReporter.record(errorMsg);
+                    }
+                }
+            }
+
+        }
+    }
+
+    /**
+     * Records an error to the error reporter if an instruction (relative or immediate) does not have an operand
+     *
+     * @param ls
+     * @param nextToken
+     */
     private void instructionErrorReporting(LineStatement ls, Token nextToken) {
         // If there is no instruction, then we assume it's a line with only a comment and ignore it
         if((ls.getInstruction() != null) && (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null)) {
-            if (!keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() == null) {
+            if ((keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("relative") ||
+                    keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("immediate")) &&
+                    ls.getInstruction().getOperand() == null) {
                 ErrorMsg errorMsg = new ErrorMsg("Instruction requires an operand.", nextToken.getPosition());
                 errorReporter.record(errorMsg);
             }
         }
     }
 
+    /**
+     * Records an error to the error reporter if a mnemonic's operand falls outside its range value
+     * Records an error to the error reporter if an inherent instruction does not have an operand
+     *
+     * @param ls
+     * @param nextToken
+     */
     private void operandErrorReporting(LineStatement ls, Token nextToken){
         String message = checkInvalidOperand(ls, nextToken.getValue());
         if(!message.equals("")){
@@ -168,7 +213,7 @@ public class Parser implements IParser {
         }
 
         // Checking if inherent instruction has an operand
-        else if(keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && nextToken.getValue() != null){
+        else if(keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent")  && nextToken.getValue() != null){
             ErrorMsg errorMsg = new ErrorMsg("Inherent instruction must not have an operand", nextToken.getPosition());
             errorReporter.record(errorMsg);
         }
@@ -178,6 +223,14 @@ public class Parser implements IParser {
         return this.ir;
     }
 
+    /**
+     * Returns a string corresponding to the error if the operand falls outside the corresponding mnemonic's
+     * range values
+     *
+     * @param ls
+     * @param value
+     * @return
+     */
     private String checkInvalidOperand(LineStatement ls, String value) {
         String errorMessage = "";
         String suffix = getSuffix(ls.getInstruction().getValue());
@@ -208,7 +261,7 @@ public class Parser implements IParser {
                     }
                     break;
                 case "i8":
-                    if (opCode < -128 || opCode > 128) {
+                    if (opCode < -128 || opCode > 127) {
                         errorMessage = "The instruction " + mnemonic + "'s operand number not in an i8 range [-128..+127].";
                     }
                     break;
