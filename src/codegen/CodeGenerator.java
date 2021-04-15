@@ -96,8 +96,9 @@ public class CodeGenerator implements ICodeGenerator {
             lst.append("\r\n");
         }
 
-        //Xaavian: Not sure where to put for now, but this is to run after the first and second passes of the IR. 
-        printVerbose(1, lst);
+        //Xaavian: Not sure where to put for now, but this is to run after the first and second passes of the IR.
+        if (verbose) 
+            printVerbose(1, lst);
 
         if (listing){
             try {
