@@ -20,7 +20,7 @@ public class CrossAssembler {
 
         Parser parser = new Parser(lexicalScanner, lexicalScanner.getKeywords(), options.getVerbose(), errorReporter);
         parser.parseTokens();
-     //   errorReporter.checkReports();
+        errorReporter.checkReports();
 
         //Copy over the (IR?) sequential list of line statements to be processed
         CodeGenerator codeGen = new CodeGenerator(lexicalScanner, lexicalScanner.getKeywords(), options.getFileName(), parser.getIR(), options.getVerbose(), options.getListing());
