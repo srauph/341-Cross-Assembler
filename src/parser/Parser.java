@@ -56,7 +56,7 @@ public class Parser implements IParser {
                     // Error reporting for when an instruction (immediate or relative) does not have an operand
                     instructionErrorReporting(ls, nextToken);
 
-                    // Relative instruction error reporting
+                    // Relative instruction error reporting, checks if a relative instruction does not refer to a label
                     relativeInstructionErrorReporting(ls, nextToken);
 
                     ir.add(ls);
@@ -104,8 +104,7 @@ public class Parser implements IParser {
                         // Shu: Added this line
                         ls.getInstruction().getMnemonic().setOpCode(keywords.get(value).getOpCode());
                     } else {
-                        ErrorMsg errorMsg = new ErrorMsg("Invalid mnemonic.", position);
-                        this.errorReporter.record(errorMsg);
+                        invalidMnemonicErrorReporting(position);
                     }
                     break;
                 case OPERAND:
@@ -143,8 +142,7 @@ public class Parser implements IParser {
                     ls.getInstruction().setOperand(operand); //set instruction's opcode
                     break;
                 default:
-                    ErrorMsg unknown_token = new ErrorMsg("Unknown token", nextToken.getPosition());
-                    errorReporter.record(unknown_token);
+                    unknownTokenErrorReporting();
             }
             if (isTesting) {
                 return;
@@ -152,6 +150,16 @@ public class Parser implements IParser {
             //Get the next token to process
             getNextToken();
         }
+    }
+
+    private void unknownTokenErrorReporting() {
+        ErrorMsg unknown_token = new ErrorMsg("Unknown token", nextToken.getPosition());
+        errorReporter.record(unknown_token);
+    }
+
+    private void invalidMnemonicErrorReporting(Position position) {
+        ErrorMsg errorMsg = new ErrorMsg("Invalid mnemonic.", position);
+        this.errorReporter.record(errorMsg);
     }
 
     /**
