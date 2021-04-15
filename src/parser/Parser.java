@@ -8,14 +8,13 @@ import lexical.LexicalScanner;
 import lexical.token.*;
 import utils.SymbolTable;
 
-import java.util.LinkedList;
 
 public class Parser implements IParser {
     //Sequence of line statements
     private IntermediateRep ir = new IntermediateRep();
-    private LinkedList<String> labels = new LinkedList();
-    private LexicalScanner lexicalScanner = null;
-    private SymbolTable<String, Mnemonic> keywords = null;
+    private final LabelValidator labelValidator = new LabelValidator();
+    private final LexicalScanner lexicalScanner;
+    private final SymbolTable<String, Mnemonic> keywords;
     private Token nextToken;
     private final IErrorReporter errorReporter;
     private boolean isTesting = false;
@@ -54,49 +53,31 @@ public class Parser implements IParser {
                 //Depending on how the input file is made, if does not end with an EOL, it will end with an EOF
                 case EOF:
                 case EOL:
-                    /**
-                     * (certain) : i put error reporting for when an instruction doesnt have an operand here because i couldnt figure
-                     * out how to do it from "case:MNEMONIC" as i would need to do lexicalScanner.getNextToken and that messes
-                     * things up. lmk if u know a different way
-                     */
                     // Error reporting for when an instruction (immediate or relative) does not have an operand
                     instructionErrorReporting(ls, nextToken);
 
                     // Relative instruction error reporting
                     relativeInstructionErrorReporting(ls, nextToken);
 
-                    System.out.println(ls);
-                    System.out.println("labels list: " + labels + "\n\n");
-
                     ir.add(ls);
                     ls = new LineStatement();
                     if (nextToken.getType() == TokenType.EOF) {
+                        //check label if it exists
+                        labelValidator.checkIfDefined(errorReporter);
                         return;
                     }
                     break;
                 case LABEL:
                     Label lb = new Label(position, value);
 
-                    // Error reporting for if a label that's defined already exists
-                    labelsErrorReporting(lb);
-
-                    /**
-                     * this part catches labels that have been defined after the line statement with the relative instruction
-                     * only way i can think of how to do it currently (other than somehow checking at EOF) is to
-                     * create a method in errorReporter than can remove an entry in it linked list, then if that label is
-                     * found, remove the entry
-                     */
-                    if(!labels.contains(lb.getLabel()) && (ls.getInstruction() != null)){
-                        ErrorMsg errorMsg = new ErrorMsg(lb.getLabel() + " label not found (or defined).", lb.getPosition());
-                        errorReporter.record(errorMsg);
-                    }
-
                     //Create label for mnemonic
                     if (inst != null && inst.getMnemonic() != null) {
                         inst.setOperand(new Operand(position, value));
                         inst.getOperand().setLabel(lb);
+                        labelValidator.addOperandLabel(lb);
                     } else { // else it is an instruction label
                         ls.setLabel(lb);
+                        labelValidator.addInstructionLabel(lb, errorReporter);
                     }
                     break;
                 case DIRECTIVE:
@@ -170,25 +151,6 @@ public class Parser implements IParser {
             }
             //Get the next token to process
             getNextToken();
-        }
-    }
-
-    /**
-     * Records an error to the error reporter if a label that is defined already exists
-     *
-     * @param lb
-     */
-    private void labelsErrorReporting(Label lb) {
-        if (!labels.contains(lb.getLabel())) {
-
-            // If the label found isn't from an instruction
-            if (ls.getInstruction() == null) {
-                labels.add(lb.getLabel());
-            }
-            // If the label already exists
-        } else {
-            ErrorMsg errorMsg = new ErrorMsg(lb.getLabel() + " label already defined.", lb.getPosition());
-            errorReporter.record(errorMsg);
         }
     }
 
