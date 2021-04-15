@@ -15,7 +15,7 @@ public class TestParser {
     void Should_Pass_If_Output_Is_Same_As_Expected() {
 
         Token[] tokenArray = {t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24};
-        Parser parse = new Parser(scanner, scanner.getKeywords(), errorReporter, true);
+        Parser parse = new Parser(scanner, scanner.getKeywords(), false, errorReporter, true);
         for (Token tok : tokenArray) {
             if (tok != null) {
                 parse.setNextToken(tok);
