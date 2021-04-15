@@ -152,11 +152,19 @@ public class Parser implements IParser {
         }
     }
 
+    /**
+     * Records an error to the error reporter if an unknown token is found
+     */
     private void unknownTokenErrorReporting() {
         ErrorMsg unknown_token = new ErrorMsg("Unknown token", nextToken.getPosition());
         errorReporter.record(unknown_token);
     }
 
+    /**
+     * Records an error to the error reporter if an invalid mnemonic is found
+     *
+     * @param position
+     */
     private void invalidMnemonicErrorReporting(Position position) {
         ErrorMsg errorMsg = new ErrorMsg("Invalid mnemonic.", position);
         this.errorReporter.record(errorMsg);
