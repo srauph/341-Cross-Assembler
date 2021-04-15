@@ -80,6 +80,17 @@ public class Parser implements IParser {
                     // Error reporting for if a label that's defined already exists
                     labelsErrorReporting(lb);
 
+                    /**
+                     * this part catches labels that have been defined after the line statement with the relative instruction
+                     * only way i can think of how to do it currently (other than somehow checking at EOF) is to
+                     * create a method in errorReporter than can remove an entry in it linked list, then if that label is
+                     * found, remove the entry
+                     */
+                    if(!labels.contains(lb.getLabel()) && (ls.getInstruction() != null)){
+                        ErrorMsg errorMsg = new ErrorMsg(lb.getLabel() + " label not found (or defined).", lb.getPosition());
+                        errorReporter.record(errorMsg);
+                    }
+
                     //Create label for mnemonic
                     if (inst != null && inst.getMnemonic() != null) {
                         inst.setOperand(new Operand(position, value));
@@ -168,14 +179,14 @@ public class Parser implements IParser {
      * @param lb
      */
     private void labelsErrorReporting(Label lb) {
-        if(!labels.contains(lb.getLabel())) {
+        if (!labels.contains(lb.getLabel())) {
 
             // If the label found isn't from an instruction
             if (ls.getInstruction() == null) {
                 labels.add(lb.getLabel());
             }
             // If the label already exists
-        } else{
+        } else {
             ErrorMsg errorMsg = new ErrorMsg(lb.getLabel() + " label already defined.", lb.getPosition());
             errorReporter.record(errorMsg);
         }
@@ -189,13 +200,13 @@ public class Parser implements IParser {
      */
     private void relativeInstructionErrorReporting(LineStatement ls, Token nextToken) {
         // If there is no instruction, then we assume it's a line with only a comment and ignore it
-        if(ls.getInstruction() != null) {
+        if (ls.getInstruction() != null) {
 
             // Extracting mnemonic name to check if it's not ldc.18, ldc.i16 or ldc.i32
             String[] mnemonicValue = ls.getInstruction().getMnemonic().getValue().split("\\.");
-            if(mnemonicValue.length > 0) {
-                if((ls.getInstruction() != null) && (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null)
-                    && !(mnemonicValue[0].equals("ldc"))) {
+            if (mnemonicValue.length > 0) {
+                if ((ls.getInstruction() != null) && (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null)
+                        && !(mnemonicValue[0].equals("ldc"))) {
                     if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("relative") &&
                             (ls.getInstruction().getOperand().getLabel() == null)) {
                         ErrorMsg errorMsg = new ErrorMsg("Relative instruction operand must refer to a label.", nextToken.getPosition());
@@ -215,7 +226,7 @@ public class Parser implements IParser {
      */
     private void instructionErrorReporting(LineStatement ls, Token nextToken) {
         // If there is no instruction, then we assume it's a line with only a comment and ignore it
-        if((ls.getInstruction() != null) && (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null)) {
+        if ((ls.getInstruction() != null) && (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null)) {
             if ((keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("relative") ||
                     keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("immediate")) &&
                     ls.getInstruction().getOperand() == null) {
@@ -226,21 +237,21 @@ public class Parser implements IParser {
     }
 
     /**
-     * Records an error to the error reporter if a mnemonic's operand falls outside its range value
-     * Records an error to the error reporter if an inherent instruction does not have an operand
+     * Records an error to the error reporter if a mnemonic's operand falls outside its range value or
+     * if an inherent instruction does not have an operand
      *
      * @param ls
      * @param nextToken
      */
-    private void operandErrorReporting(LineStatement ls, Token nextToken){
+    private void operandErrorReporting(LineStatement ls, Token nextToken) {
         String message = checkInvalidOperand(ls, nextToken.getValue());
-        if(!message.equals("")){
+        if (!message.equals("")) {
             ErrorMsg errorMsg = new ErrorMsg(message, nextToken.getPosition());
             errorReporter.record(errorMsg);
         }
 
         // Checking if inherent instruction has an operand
-        else if(keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent")  && nextToken.getValue() != null){
+        else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && nextToken.getValue() != null) {
             ErrorMsg errorMsg = new ErrorMsg("Inherent instruction must not have an operand", nextToken.getPosition());
             errorReporter.record(errorMsg);
         }
