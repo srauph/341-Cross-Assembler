@@ -15,7 +15,7 @@ public class TestErrorReporter {
     void Should_Return_True_If_No_Errors_Detected() {
 
         Token[] tokenArray = {t1, t2, t3, t4, t5, t6, t7, t8, t9, t10};
-        Parser parse = new Parser(scanner, scanner.getKeywords(), errorReporter, true);
+        Parser parse = new Parser(scanner, scanner.getKeywords(), false, errorReporter, true);
         for (Token tok : tokenArray) {
             if (tok != null) {
                 parse.setNextToken(tok);

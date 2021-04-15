@@ -19,17 +19,19 @@ public class Parser implements IParser {
     private final IErrorReporter errorReporter;
     private boolean isTesting = false;
     private LineStatement ls = new LineStatement();
+    private boolean verbose = false;
 
-    public Parser(LexicalScanner lexicalScanner, SymbolTable<String, Mnemonic> keywords, IErrorReporter errorRep) {
-        this(lexicalScanner, keywords, errorRep, false);
+    public Parser(LexicalScanner lexicalScanner, SymbolTable<String, Mnemonic> keywords, boolean verbose, IErrorReporter errorRep) {
+        this(lexicalScanner, keywords, verbose, errorRep, false);
     }
 
-    public Parser(LexicalScanner lexicalScanner, SymbolTable<String, Mnemonic> keywords, IErrorReporter errorRep, boolean isTesting) {
+    public Parser(LexicalScanner lexicalScanner, SymbolTable<String, Mnemonic> keywords, boolean verbose, IErrorReporter errorRep, boolean isTesting) {
         this.isTesting = isTesting;
         this.lexicalScanner = lexicalScanner;
         this.keywords = keywords;
         this.getNextToken();
         this.errorReporter = errorRep;
+        this.verbose = verbose;
     }
 
     /**
@@ -43,6 +45,9 @@ public class Parser implements IParser {
      * LineStatement = [ Label ] [ Instruction | Directive ] [ Comment ] EOL .
      */
     public void parseTokens() {
+        if (verbose){
+            System.out.println("Parsing tokens.\n");
+        }
         while (true) {
             TokenType type = nextToken.getType();
             Position position = nextToken.getPosition();
@@ -56,14 +61,19 @@ public class Parser implements IParser {
                     // Error reporting for when an instruction (immediate or relative) does not have an operand
                     instructionErrorReporting(ls, nextToken);
 
-                    // Relative instruction error reporting
+                    // Relative instruction error reporting, checks if a relative instruction does not refer to a label
                     relativeInstructionErrorReporting(ls, nextToken);
 
                     ir.add(ls);
                     ls = new LineStatement();
                     if (nextToken.getType() == TokenType.EOF) {
+
                         //check label if it exists
-                        labelValidator.checkIfDefined(errorReporter);
+                        operandLabelNotDefinedErrorReporting();
+
+                        if (verbose)
+                            System.out.println("Tokens Sucessfully parsed.\n");
+
                         return;
                     }
                     break;
@@ -104,8 +114,7 @@ public class Parser implements IParser {
                         // Shu: Added this line
                         ls.getInstruction().getMnemonic().setOpCode(keywords.get(value).getOpCode());
                     } else {
-                        ErrorMsg errorMsg = new ErrorMsg("Invalid mnemonic.", position);
-                        this.errorReporter.record(errorMsg);
+                        invalidMnemonicErrorReporting(position);
                     }
                     break;
                 case OPERAND:
@@ -143,8 +152,7 @@ public class Parser implements IParser {
                     ls.getInstruction().setOperand(operand); //set instruction's opcode
                     break;
                 default:
-                    ErrorMsg unknown_token = new ErrorMsg("Unknown token", nextToken.getPosition());
-                    errorReporter.record(unknown_token);
+                    unknownTokenErrorReporting();
             }
             if (isTesting) {
                 return;
@@ -152,6 +160,32 @@ public class Parser implements IParser {
             //Get the next token to process
             getNextToken();
         }
+    }
+
+    /**
+     * Checks if an operand label is defined by an instruction label and if not records an error.
+     *
+     */
+    private void operandLabelNotDefinedErrorReporting() {
+        labelValidator.checkIfDefined(errorReporter);
+    }
+
+    /**
+     * Records an error to the error reporter if an unknown token is found
+     */
+    private void unknownTokenErrorReporting() {
+        ErrorMsg unknown_token = new ErrorMsg("Unknown token", nextToken.getPosition());
+        errorReporter.record(unknown_token);
+    }
+
+    /**
+     * Records an error to the error reporter if an invalid mnemonic is found
+     *
+     * @param position
+     */
+    private void invalidMnemonicErrorReporting(Position position) {
+        ErrorMsg errorMsg = new ErrorMsg("Invalid mnemonic.", position);
+        this.errorReporter.record(errorMsg);
     }
 
     /**
@@ -168,8 +202,7 @@ public class Parser implements IParser {
             String[] mnemonicValue = ls.getInstruction().getMnemonic().getValue().split("\\.");
             if (mnemonicValue.length > 0) {
                 if ((ls.getInstruction() != null) && (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null)
-                        && !mnemonicValue[0].equals("ldc") && !mnemonicValue[0].equals("ldv") && !mnemonicValue[0].equals("stv")
-                        && !mnemonicValue[0].equals("lda")) {
+                        && !mnemonicValue[0].equals("ldc") && !mnemonicValue[0].equals("ldv") && !mnemonicValue[0].equals("stv")) {
                     if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("relative") &&
                             (ls.getInstruction().getOperand().getLabel() == null)) {
                         ErrorMsg errorMsg = new ErrorMsg("Relative instruction operand must refer to a label.", nextToken.getPosition());

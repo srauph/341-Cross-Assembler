@@ -1,4 +1,8 @@
+import errorhandling.ErrorReporter;
 import lexical.LexicalScanner;
+import options.Options;
+import parser.Parser;
+import codegen.CodeGenerator;
 
 public class CrossAssembler {
 
@@ -6,20 +10,23 @@ public class CrossAssembler {
         //Reads filename and arguments
         Options options = new Options(args);
 
+        // Create error reporter
+        ErrorReporter errorReporter = new ErrorReporter(options);
+
         //Will analyze the .asm for tokens
         LexicalScanner lexicalScanner = new LexicalScanner(options.getInputFile());
 
         //Using the lexical analyzer, parse them to generate a line of statements
-        ErrorReporter errorReporter = new ErrorReporter(options);
-        Parser parser = new Parser(lexicalScanner, lexicalScanner.getKeywords(), errorReporter);
+
+        Parser parser = new Parser(lexicalScanner, lexicalScanner.getKeywords(), options.getVerbose(), errorReporter);
         parser.parseTokens();
         errorReporter.checkReports();
 
         //Copy over the (IR?) sequential list of line statements to be processed
-        //TODO: Uncomment after parser is fixed for sprint 3 <-- Uncommented! :D
-        CodeGenerator codeGen = new CodeGenerator(lexicalScanner, lexicalScanner.getKeywords(), options.getFileName(), parser.getIR());
+        CodeGenerator codeGen = new CodeGenerator(lexicalScanner, lexicalScanner.getKeywords(), options.getFileName(), parser.getIR(), options.getVerbose(), options.getListing());
         codeGen.generateListing();
 
-        System.out.println("Done creating "+options.getFileName()+".lst file.");
+        System.out.println("Done!");
+
     }
 }
