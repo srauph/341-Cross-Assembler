@@ -57,13 +57,7 @@ public class Parser implements IParser {
                      * things up. lmk if u know a different way
                      */
                     // Error reporting for when an instruction (immediate or relative) does not have an operand
-                    // If there is no instruction, then we assume it's a line with only a comment and ignore it
-                    if((ls.getInstruction() != null) && (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null)) {
-                        if (!keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() == null) {
-                            ErrorMsg errorMsg = new ErrorMsg("Instruction requires an operand.", nextToken.getPosition());
-                            errorReporter.record(errorMsg);
-                        }
-                    }
+                    instructionErrorReporting(ls, nextToken);
 
                     ir.add(ls);
                     ls = new LineStatement();
@@ -117,27 +111,7 @@ public class Parser implements IParser {
 
 
                     // Operand error reporting
-                    String message = checkInvalidOperand(ls, nextToken.getValue());
-                    if(!message.equals("")){
-                        ErrorMsg errorMsg = new ErrorMsg(message, nextToken.getPosition());
-                        errorReporter.record(errorMsg);
-                    }
-
-                    // Checking if inherent instruction has an operand
-                    else if(keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && nextToken.getValue() != null){
-                        ErrorMsg errorMsg = new ErrorMsg("Inherent instruction must not have an operand", nextToken.getPosition());
-                        errorReporter.record(errorMsg);
-                    }
-
-                    /*
-                    // Checking if immediate or relative instruction does not have an operand
-                    else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("immediate") && nextToken.getValue() == null) {
-                        System.out.println("here2");
-                        ErrorMsg errorMsg = new ErrorMsg("Instruction requires an operand.", nextToken.getPosition());
-                        errorReporter.record(errorMsg);
-                    }
-
-                     */
+                    operandErrorReporting(ls, nextToken);
 
                     Mnemonic mne = ls.getInstruction().getMnemonic();
                     int opc = Integer.parseInt(value);
@@ -173,6 +147,30 @@ public class Parser implements IParser {
             }
             //Get the next token to process
             getNextToken();
+        }
+    }
+
+    private void instructionErrorReporting(LineStatement ls, Token nextToken) {
+        // If there is no instruction, then we assume it's a line with only a comment and ignore it
+        if((ls.getInstruction() != null) && (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null)) {
+            if (!keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && ls.getInstruction().getOperand() == null) {
+                ErrorMsg errorMsg = new ErrorMsg("Instruction requires an operand.", nextToken.getPosition());
+                errorReporter.record(errorMsg);
+            }
+        }
+    }
+
+    private void operandErrorReporting(LineStatement ls, Token nextToken){
+        String message = checkInvalidOperand(ls, nextToken.getValue());
+        if(!message.equals("")){
+            ErrorMsg errorMsg = new ErrorMsg(message, nextToken.getPosition());
+            errorReporter.record(errorMsg);
+        }
+
+        // Checking if inherent instruction has an operand
+        else if(keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && nextToken.getValue() != null){
+            ErrorMsg errorMsg = new ErrorMsg("Inherent instruction must not have an operand", nextToken.getPosition());
+            errorReporter.record(errorMsg);
         }
     }
 
