@@ -168,7 +168,7 @@ public class Parser implements IParser {
             String[] mnemonicValue = ls.getInstruction().getMnemonic().getValue().split("\\.");
             if (mnemonicValue.length > 0) {
                 if ((ls.getInstruction() != null) && (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null)
-                        && !(mnemonicValue[0].equals("ldc"))) {
+                        && !mnemonicValue[0].equals("ldc") && !mnemonicValue[0].equals("ldv") &&!mnemonicValue[0].equals("stv")) {
                     if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("relative") &&
                             (ls.getInstruction().getOperand().getLabel() == null)) {
                         ErrorMsg errorMsg = new ErrorMsg("Relative instruction operand must refer to a label.", nextToken.getPosition());
