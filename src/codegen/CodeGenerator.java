@@ -17,17 +17,23 @@ public class CodeGenerator implements ICodeGenerator {
     private final SymbolTable<String, /*Token*/ Mnemonic> keyword;
     // private final SymbolTable<??, ??> labels;  //future use in resolving labels during code generation
     private final String fileName;
+    private boolean verbose = false;
+    private boolean listing = false;
 
     // Shu: As above, i needed to change it to Mnemonic for the shebang to work.
-    public CodeGenerator(LexicalScanner lexicalScanner, SymbolTable<String, /*Token*/ Mnemonic> keyword, String fileName, IntermediateRep ir) {
+    public CodeGenerator(LexicalScanner lexicalScanner, SymbolTable<String, /*Token*/ Mnemonic> keyword, String fileName, IntermediateRep ir, boolean verbose, boolean listing) {
         this.lexicalScanner = lexicalScanner;
         this.fileName = fileName;
         this.keyword = keyword;
         this.ir = new IntermediateRep();
         this.ir.copyIR(ir);
+        this.verbose = verbose;
+        this.listing = listing;
     }
 
     public void generateListing() {
+        if (verbose)
+            System.out.println("Generating Listing\n");
         StringBuilder lst = new StringBuilder();
         // Shu: Changed the line to more closely match the prof's example.
         lst.append("Line Addr Code          Label         Mne         Operand             Comments\r\n");
@@ -90,16 +96,41 @@ public class CodeGenerator implements ICodeGenerator {
             lst.append("\r\n");
         }
 
-        try {
-            FileOutputStream out = new FileOutputStream(fileName + ".lst");
-            out.write(lst.toString().getBytes());
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        //Xaavian: Not sure where to put for now, but this is to run after the first and second passes of the IR. 
+        printVerbose(1, lst);
+
+        if (listing){
+            try {
+                FileOutputStream out = new FileOutputStream(fileName + ".lst");
+                out.write(lst.toString().getBytes());
+                out.close();
+                System.out.println("Done creating " + fileName + ".lst file.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void generateExecutable() {
 
+    }
+
+    private void printVerbose(int passNo, StringBuilder lst){
+        String passString;
+        if (passNo == 1){
+            passString = "first";
+        } else {
+            passString = "second";
+        }
+        System.out.println("Pass " + passNo + " Done.\n");
+        if (passNo == 1)
+            System.out.println("SymbolTable: (after the first pass)\n");
+        //Xaavian: Can only implement following line when SymbolTable<??,??> labels becomes implemented
+        System.out.println("This is where the labels SymbolTable will go once implemented\n");
+        System.out.println("Listing: (after the " + passString + " pass)\n");
+        StringBuilder modlst = new StringBuilder();
+        modlst.append(lst.toString());
+        modlst.delete(0,80);
+        System.out.println(modlst);
     }
 }
