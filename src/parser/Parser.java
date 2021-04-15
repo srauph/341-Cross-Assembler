@@ -8,9 +8,12 @@ import lexical.LexicalScanner;
 import lexical.token.*;
 import utils.SymbolTable;
 
+import java.util.LinkedList;
+
 public class Parser implements IParser {
     //Sequence of line statements
     private IntermediateRep ir = new IntermediateRep();
+    private LinkedList<String> labels = new LinkedList();
     private LexicalScanner lexicalScanner = null;
     private SymbolTable<String, Mnemonic> keywords = null;
     private Token nextToken;
@@ -62,6 +65,8 @@ public class Parser implements IParser {
                     // Relative instruction error reporting
                     relativeInstructionErrorReporting(ls, nextToken);
 
+                    System.out.println(ls);
+                    System.out.println("labels list: " + labels + "\n\n");
 
                     ir.add(ls);
                     ls = new LineStatement();
@@ -71,6 +76,9 @@ public class Parser implements IParser {
                     break;
                 case LABEL:
                     Label lb = new Label(position, value);
+
+                    // Error reporting for if a label that's defined already exists
+                    labelsErrorReporting(lb);
 
                     //Create label for mnemonic
                     if (inst != null && inst.getMnemonic() != null) {
@@ -151,6 +159,25 @@ public class Parser implements IParser {
             }
             //Get the next token to process
             getNextToken();
+        }
+    }
+
+    /**
+     * Records an error to the error reporter if a label that is defined already exists
+     *
+     * @param lb
+     */
+    private void labelsErrorReporting(Label lb) {
+        if(!labels.contains(lb.getLabel())) {
+
+            // If the label found isn't from an instruction
+            if (ls.getInstruction() == null) {
+                labels.add(lb.getLabel());
+            }
+            // If the label already exists
+        } else{
+            ErrorMsg errorMsg = new ErrorMsg(lb.getLabel() + " label already defined.", lb.getPosition());
+            errorReporter.record(errorMsg);
         }
     }
 
