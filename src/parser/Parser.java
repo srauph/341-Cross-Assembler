@@ -69,7 +69,7 @@ public class Parser implements IParser {
                     if (nextToken.getType() == TokenType.EOF) {
 
                         //check label if it exists
-                        operandLabelNotDefinedErrorReporting();
+                        operandLabelErrorReporting();
 
                         if (verbose)
                             System.out.println("Tokens Sucessfully parsed.\n");
@@ -166,7 +166,7 @@ public class Parser implements IParser {
      * Checks if an operand label is defined by an instruction label and if not records an error.
      *
      */
-    private void operandLabelNotDefinedErrorReporting() {
+    private void operandLabelErrorReporting() {
         labelValidator.checkIfDefined(errorReporter);
     }
 
