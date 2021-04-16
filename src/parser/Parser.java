@@ -87,7 +87,7 @@ public class Parser implements IParser {
                         labelValidator.addOperandLabel(lb);
                     } else { // else it is an instruction label
                         ls.setLabel(lb);
-                        labelValidator.instructionLabelErrorReporting(lb, errorReporter);
+                        instructionLabelErrorReporting(lb);
                     }
                     break;
                 case DIRECTIVE:
@@ -160,6 +160,15 @@ public class Parser implements IParser {
             //Get the next token to process
             getNextToken();
         }
+    }
+
+    /**
+     * Checks if the instruction is already defined, and if it is already defined the error reporter will record an error.
+     *
+     * @param lb
+     */
+    private void instructionLabelErrorReporting(Label lb) {
+        labelValidator.instructionLabelErrorReporting(lb, errorReporter);
     }
 
     /**
