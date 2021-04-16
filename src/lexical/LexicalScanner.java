@@ -145,7 +145,7 @@ public class LexicalScanner implements ILexicalScanner {
 
         //Check EOF
         if (StringUtils.isEOF(c)) {
-            //  errorReporter.checkReports();
+            errorReporter.checkReports();
             //Check if any errors for scanner exist and if so, print and terminate?
             return new Token(new Position(lineNumber, 0), "EOF", TokenType.EOF);
         }
