@@ -4,6 +4,7 @@ import lexical.token.Comment;
 import lexical.token.Directive;
 import lexical.token.Instruction;
 import lexical.token.Label;
+import utils.StringUtils;
 
 public class LineStatement {
     private Label label = null;
@@ -11,6 +12,8 @@ public class LineStatement {
     private Instruction instruction;
     private Directive directive;
     private Comment comment;
+    private int address;
+    private int[] code = new int[0];
 
     public LineStatement() {
     }
@@ -47,6 +50,22 @@ public class LineStatement {
         this.label = label;
     }
 
+    public int getAddress() {
+        return address;
+    }
+
+    public void setAddress(int address) {
+        this.address = address;
+    }
+
+    public int[] getCode() {
+        return code;
+    }
+
+    public void setCode(int[] code) {
+        this.code = code;
+    }
+
     @Override
     public String toString() {
         return "LineStatement{" +
@@ -54,6 +73,8 @@ public class LineStatement {
                 ", instruction=" + instruction +
                 ", directive=" + directive +
                 ", comment=" + comment +
+                ", address=" + address +
+                ", code=" + StringUtils.getHexStringFromIntArray(code) +
                 '}';
     }
 }

@@ -1,8 +1,8 @@
+import codegen.CodeGenerator;
 import errorhandling.ErrorReporter;
 import lexical.LexicalScanner;
 import options.Options;
 import parser.Parser;
-import codegen.CodeGenerator;
 
 public class CrossAssembler {
 
@@ -24,7 +24,7 @@ public class CrossAssembler {
 
         //Copy over the (IR?) sequential list of line statements to be processed
         CodeGenerator codeGen = new CodeGenerator(lexicalScanner, lexicalScanner.getKeywords(), options.getFileName(), parser.getIR(), options.getVerbose(), options.getListing());
-        codeGen.generateListing();
+        codeGen.generateExecutable();
 
     }
 }

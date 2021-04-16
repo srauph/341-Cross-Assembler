@@ -1,6 +1,6 @@
+import lexical.token.Mnemonic;
 import lexical.token.Position;
 import lexical.token.TokenType;
-import lexical.token.Mnemonic;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

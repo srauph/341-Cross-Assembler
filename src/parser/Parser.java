@@ -45,7 +45,7 @@ public class Parser implements IParser {
      * LineStatement = [ Label ] [ Instruction | Directive ] [ Comment ] EOL .
      */
     public void parseTokens() {
-        if (verbose){
+        if (verbose) {
             System.out.println("Parsing tokens.\n");
         }
         while (true) {
@@ -71,9 +71,9 @@ public class Parser implements IParser {
                         //check label if it exists
                         operandLabelErrorReporting();
 
-                        if (verbose)
-                            System.out.println("Tokens Sucessfully parsed.\n");
-
+                        if (verbose) {
+                            System.out.println("Tokens Successfully parsed.\n");
+                        }
                         return;
                     }
                     break;
@@ -173,7 +173,6 @@ public class Parser implements IParser {
 
     /**
      * Checks if an operand label is defined by an instruction label and if not records an error.
-     *
      */
     private void operandLabelErrorReporting() {
         labelValidator.operandLabelErrorReporting(errorReporter);
@@ -250,7 +249,7 @@ public class Parser implements IParser {
      */
     private void operandErrorReporting(LineStatement ls, Token nextToken) {
         String message = checkInvalidOperand(ls, nextToken.getValue());
-        if (!message.equals("")) {
+        if (!message.isEmpty()) {
             ErrorMsg errorMsg = new ErrorMsg(message, nextToken.getPosition());
             errorReporter.record(errorMsg);
         }

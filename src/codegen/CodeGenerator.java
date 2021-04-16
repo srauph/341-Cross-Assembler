@@ -31,8 +31,87 @@ public class CodeGenerator implements ICodeGenerator {
         this.listing = listing;
     }
 
-    public void generateListing() {
-        if (verbose)
+    public void generateExecutable() {
+        if (verbose) {
+            System.out.println("Generating Listing\n");
+        }
+        StringBuilder lst = null;
+        if (listing) {
+            String header = String.format("%-4s %-4s %-16s %-16s %-16s %-16s %-16s", "Line", "Addr", "Machine Code", "Label", "Mne", "Operand", "Comments");
+            lst = new StringBuilder(header);
+            lst.append("\r\n");
+
+        }
+
+        /*
+          Do the passes to resolve instructions like labels
+
+          Pass 1
+          printVerbose(1, lst);
+          Pass 2
+          printVerbose(2, lst);
+
+
+         */
+        int linePosition = 1;
+        for (LineStatement ls : ir.getStatements()) {
+            if (ls == null) {
+                continue;
+            }
+
+            if (listing && lst != null) {
+
+                //Line
+                lst.append(StringUtils.getCustomFormat(4, linePosition, true));
+                ++linePosition;
+
+                //Addr
+                lst.append(StringUtils.getCustomFormat(4, StringUtils.getHexFromDecimal(ls.getAddress(), 4, false), true));
+
+                //Machine code
+
+                lst.append(StringUtils.getCustomFormat(16, StringUtils.getHexStringFromIntArray(ls.getCode()) , true));
+
+                //Label
+                lst.append(StringUtils.getCustomFormat(16, ls.getLabel() != null ? ls.getLabel().getLabel() : "", true));
+
+                //Mnemonic & Operand
+                if (ls.getDirective() != null) {
+                    lst.append(StringUtils.getCustomFormat(16, ls.getDirective().getDirective(), true));
+                    lst.append(StringUtils.getCustomFormat(16, ls.getDirective().getStringOperand(), true));
+                } else if (ls.getInstruction() != null && ls.getInstruction().getOperand() != null) {
+                    lst.append(StringUtils.getCustomFormat(16, ls.getInstruction().getMnemonic().getValue(), true));
+                    lst.append(StringUtils.getCustomFormat(16, ls.getInstruction().getOperand().getValue(), true));
+                } else {
+                    lst.append(StringUtils.getCustomFormat(16, "", true));
+                    lst.append(StringUtils.getCustomFormat(16, "", true));
+                }
+
+                if (ls.getComment() != null) {
+                    lst.append(ls.getComment().getComment());
+                }
+                //Comments
+
+                lst.append("\r\n");
+            }
+        }
+        //Generate .exe here, need the machine code for this
+
+
+
+
+        if (listing && lst != null) {
+            try {
+                FileOutputStream out = new FileOutputStream(fileName + ".lst");
+                out.write(lst.toString().getBytes());
+                out.close();
+                System.out.println("Done creating " + fileName + ".lst file.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+   /*     if (verbose)
             System.out.println("Generating Listing\n");
         StringBuilder lst = new StringBuilder();
         // Shu: Changed the line to more closely match the prof's example.
@@ -241,29 +320,20 @@ public class CodeGenerator implements ICodeGenerator {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
-    public void generateExecutable() {
-
-    }
-
-    private void printVerbose(int passNo, StringBuilder lst){
-        String passString;
-        if (passNo == 1){
-            passString = "first";
-        } else {
-            passString = "second";
-        }
+    private void printVerbose(int passNo, StringBuilder lst) {
         System.out.println("Pass " + passNo + " Done.\n");
-        if (passNo == 1)
+        if (passNo == 1) {
             System.out.println("SymbolTable: (after the first pass)\n");
+        }
         //Xaavian: Can only implement following line when SymbolTable<??,??> labels becomes implemented
         System.out.println("This is where the labels SymbolTable will go once implemented\n");
-        System.out.println("Listing: (after the " + passString + " pass)\n");
+        System.out.println("Listing: (after the " + (passNo == 1 ? "first" : "second") + " pass)\n");
         StringBuilder modlst = new StringBuilder();
         modlst.append(lst.toString());
-        modlst.delete(0,80);
+        modlst.delete(0, 80);
         System.out.println(modlst);
     }
 }
