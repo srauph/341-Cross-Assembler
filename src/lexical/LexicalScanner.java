@@ -32,8 +32,7 @@ public class LexicalScanner implements ILexicalScanner {
     public LexicalScanner(String inputFile) {
         try {
             File file = new File(inputFile);
-            // Shu: This ws annoying me so i flipped it. Feel free to flip it back if you want.
-//            file.setWritable(false);
+            file.setWritable(false);
             fis = new FileInputStream(file);
             keywords = new SymbolTable<>();
             initKeywordTable();
