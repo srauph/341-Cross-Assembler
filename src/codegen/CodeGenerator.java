@@ -36,7 +36,7 @@ public class CodeGenerator implements ICodeGenerator {
             System.out.println("Generating Listing\n");
         StringBuilder lst = new StringBuilder();
         // Shu: Changed the line to more closely match the prof's example.
-        lst.append("Line Addr Code          Label         Mne         Operand             Comments\r\n");
+        lst.append("Line Addr Machine Code  Label         Mne         Operand             Comments\r\n");
         int linePosition = 1;
         int addr = 0;
         for (LineStatement ls : ir.getStatements()) {
@@ -55,7 +55,6 @@ public class CodeGenerator implements ICodeGenerator {
             if (ls.getInstruction() != null || ls.getDirective() != null) {
                 addr++;
 
-                // Shu: I don't care anymore so im hardcoding it LOL
                 if (ls.getInstruction() != null) {
                     switch(keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode()) {
                         case 0xD9:
@@ -81,18 +80,19 @@ public class CodeGenerator implements ICodeGenerator {
             if (ls.getInstruction() != null) {
                 Mnemonic mne = keyword.get(ls.getInstruction().getMnemonic().getValue());
                 lst.append(StringUtils.getCustomFormat(
-                        4,
+                        3,
                         // Shu: pull the opcode and print that
                         StringUtils.getHexFromDecimal(mne == null ? -1 : keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode(), 2, false)
                 ));
             }
 
+            //Label
             if (ls.getInstruction() != null) {
-                if (ls.getInstruction().getMnemonic().getMode() == "relative") {
+                if (ls.getInstruction().getMnemonic().getMode().equals("relative")) {
                     if (keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode() == 0xD9) {
                         Mnemonic mne = keyword.get(ls.getInstruction().getMnemonic().getValue());
                         lst.append(StringUtils.getCustomFormat(
-                                4,
+                                5,
                                 // Shu: pull the opcode and print that
                                 StringUtils.getHexFromDecimal(mne == null ? -1 : ls.getInstruction().getOperand().getOperand(), 2, false)
                         ));
@@ -205,7 +205,7 @@ public class CodeGenerator implements ICodeGenerator {
             lst.append(StringUtils.getCustomFormat(10, " ")); // Padding between Code and Mne
             //Begin Generating Closing of line statement
             //Label
-            lst.append(StringUtils.getCustomFormat(5, ls.getLabel() == null ? " " : ls.getLabel().getLabel()));
+            lst.append(StringUtils.getCustomFormat(3, ls.getLabel() == null ? " " : ls.getLabel().getLabel()));
 
             lst.append(StringUtils.getCustomFormat(9, " "));// Padding between Label and Mne
             //Mne

@@ -26,7 +26,5 @@ public class CrossAssembler {
         CodeGenerator codeGen = new CodeGenerator(lexicalScanner, lexicalScanner.getKeywords(), options.getFileName(), parser.getIR(), options.getVerbose(), options.getListing());
         codeGen.generateListing();
 
-        System.out.println("Done!");
-
     }
 }
