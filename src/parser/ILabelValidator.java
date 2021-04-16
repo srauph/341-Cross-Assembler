@@ -9,7 +9,7 @@ public interface ILabelValidator {
 
     void addOperandLabel(Label label);
 
-    void addInstructionLabel(Label label, IErrorReporter errorReporter);
+    void instructionLabelErrorReporting(Label label, IErrorReporter errorReporter);
 
-    void checkIfDefined(IErrorReporter errorReporter);
+    void operandLabelErrorReporting(IErrorReporter errorReporter);
 }
