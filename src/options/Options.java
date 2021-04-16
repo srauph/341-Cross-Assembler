@@ -2,7 +2,7 @@ package options;
 
 import java.io.File;
 
-public class Options {
+public class Options implements IOptions {
 
     //options that can be enabled
     private boolean verbose;
@@ -12,32 +12,25 @@ public class Options {
     private String inputfile;
     private String filename;
 
-    public Options() {
-        verbose = false;
-        help = false;
-        listing = false;
-        banner = false;
-        inputfile = "";
-        filename = "";
+    public Options(String[] args) {
+        this.verbose = false;
+        this.help = false;
+        this.listing = false;
+        this.banner = false;
+        this.inputfile = "";
+        this.filename = "";
+
+        parseOptions(args);
     }
 
-    public Options(String[] args) {
-
-        verbose = false;
-        help = false;
-        listing = false;
-        banner = false;
-        inputfile = "";
-        filename = "";
-
+    public void parseOptions(String[] args) {
         int num = args.length;
         int i = 0;
 
         try {
-
-            if (num < 1)
+            if (num < 1) {
                 throw new Exception("No File Specified");
-
+            }
             while (i < num - 1) {
                 switch (args[i]) {
                     case "-h":
@@ -61,26 +54,17 @@ public class Options {
                 }
                 i++;
             }
-
-            if (args[i].equals("-h")||args[i].equals("-help")){
+            if (args[i].equals("-h") || args[i].equals("-help")) {
                 help = true;
             }
-
-            if (args[i].equals("-b")||args[i].equals("-banner")){
+            if (args[i].equals("-b") || args[i].equals("-banner")) {
                 banner = true;
             }
-
-            if (help){
-                System.out.println("Usage: CrossAssembler [options] <file>.asm\n\n" + 
-                    "Options:\n\n" + 
-                    "Short Version  Long Version  Meaning\n" + 
-                    "-h             -help         Print the usage of the program.\n" +
-                    "-v             -verbose      Verbose during the execution of the program.\n" +
-                    "-b             -banner       Print the banner of the program\n" + 
-                    "-l             -listing      Generate a listing of the assembly file\n");
+            if (help) {
+                showHelp();
                 System.exit(0);
-            } else if (banner){
-                System.out.println("Cm Cross-Assembler version 0.5 - Developped by Team 10. 2021");
+            } else if (banner) {
+                showBanner();
                 System.exit(0);
             } else {
                 if (args[i].charAt(0) == '-') {
@@ -91,25 +75,33 @@ public class Options {
                     if (!(f.exists() && !f.isDirectory())) {
                         throw new Exception("File " + args[i] + " not found");
                     } else {
-                        if(args[i].length() > 4 && args[i].substring(args[i].length()-4,args[i].length()).equals(".asm")){
+                        if (args[i].length() > 4 && args[i].substring(args[i].length() - 4, args[i].length()).equals(".asm")) {
                             inputfile = args[i];
                             filename = inputfile.replace(".asm", "");
-                        }else{
+                        } else {
                             throw new Exception("Invalid file type. Must be an .asm file.");
                         }
                     }
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
-
     }
 
-    public void printValues() {
-        System.out.println("help: " + help + "\nlisting: " + listing + "\nverbose: " + verbose + "\ninputfile: " + inputfile + "\nfilename: " + filename);
+    public void showHelp() {
+        System.out.println("Usage: CrossAssembler [options] <file>.asm\n\n" +
+                "Options:\n\n" +
+                "Short Version  Long Version  Meaning\n" +
+                "-h             -help         Print the usage of the program.\n" +
+                "-v             -verbose      Verbose during the execution of the program.\n" +
+                "-b             -banner       Print the banner of the program\n" +
+                "-l             -listing      Generate a listing of the assembly file\n");
+    }
+
+    public void showBanner() {
+        System.out.println("Cm Cross-Assembler version 4.1 - Developed by Team 10. 2021");
     }
 
     public boolean getVerbose() {
@@ -159,5 +151,4 @@ public class Options {
     public void setFileName(String x) {
         filename = x;
     }
-
 }
