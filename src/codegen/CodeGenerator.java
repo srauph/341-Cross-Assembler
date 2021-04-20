@@ -3,22 +3,28 @@ package codegen;
 import ir.IntermediateRep;
 import ir.LineStatement;
 import lexical.LexicalScanner;
+import lexical.token.Instruction;
 import lexical.token.Mnemonic;
+import utils.Pair;
 import utils.StringUtils;
 import utils.SymbolTable;
 
+import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Map;
 
 public class CodeGenerator implements ICodeGenerator {
     private final IntermediateRep ir;
     private final LexicalScanner lexicalScanner;
     // Shu: Idk but i needed to change it to Mnemonic for the shebang to work.
     private final SymbolTable<String, /*Token*/ Mnemonic> keyword;
-    // private final SymbolTable<??, ??> labels;  //future use in resolving labels during code generation
+    private final SymbolTable<String, Pair<String, Integer>> lookUpTable = new SymbolTable<>();
     private final String fileName;
-    private boolean verbose = false;
-    private boolean listing = false;
+    private boolean verbose;
+    private boolean listing;
 
     // Shu: As above, i needed to change it to Mnemonic for the shebang to work.
     public CodeGenerator(LexicalScanner lexicalScanner, SymbolTable<String, /*Token*/ Mnemonic> keyword, String fileName, IntermediateRep ir, boolean verbose, boolean listing) {
@@ -42,19 +48,98 @@ public class CodeGenerator implements ICodeGenerator {
             lst.append("\r\n");
 
         }
+        assignAddresses(); // assign the addresses
 
-        /*
-          Do the passes to resolve instructions like labels
-
-          Pass 1
-          printVerbose(1, lst);
-          Pass 2
-          printVerbose(2, lst);
-
-
-         */
+        //Pass 1
+        //Create the Table
         int linePosition = 1;
+
         for (LineStatement ls : ir.getStatements()) {
+            ls.setLinePosition(linePosition);
+            ++linePosition;
+            if (ls.getLabel() != null) {
+                if (!lookUpTable.containsKey(ls.getLabel().getLabel())) {
+                    lookUpTable.put(ls.getLabel().getLabel(), new Pair<>("Label", ls.getAddress()));
+                    if (ls.getInstruction() != null) {
+                        //Resolve what we can backwards if it a label defined linestatement
+                        if (ls.getInstruction().getMnemonic() != null) {
+                            if (ls.getInstruction().getOperand().getLabel() != null) {
+                                int value = lookUpTable.get(ls.getInstruction().getOperand().getLabel().getLabel()).getValue() - ls.getAddress();
+                                ls.setCode(new int[]{keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode(), value});
+                                ls.setResolved(true);
+                            }
+                        }
+                    }
+                }
+            }
+            //First Pass of Resolving backwards
+
+            Instruction inst = ls.getInstruction();
+            if (inst != null) {
+                if (inst.getMnemonic() != null && ls.getLabel() == null) {
+                    String mnemonic = ls.getInstruction().getMnemonic().getValue();
+                    if (!lookUpTable.containsKey(mnemonic)) {
+                        lookUpTable.put(mnemonic, new Pair<>("Mnemonic", keyword.get(mnemonic).getOpCode()));
+                    }
+                    if (ls.getCode().length == 0 && inst.getOperand() != null) {
+
+                        Pair<String, Integer> pp = lookUpTable.get(inst.getOperand().getLabel().getLabel());
+                        if (lookUpTable.get(inst.getOperand().getLabel().getLabel()) == null) {
+                            ls.setCode(new int[]{keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode()});
+                        } else {
+                            int lookUpValue = lookUpTable.get(ls.getInstruction().getOperand().getLabel().getLabel()).getValue();
+                            int address = ls.getAddress();
+                            int value = Integer.parseInt(String.valueOf((0xFF & (lookUpValue - address))));
+
+                            int[] arr = new int[ls.getAddressSize()];
+                            arr[0] = keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode();
+                            arr[1] = value;
+                            ls.setCode(arr);
+                            ls.setResolved(true);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (verbose) {
+            printVerbose(1);
+        }
+
+        //Second Pass of Resolving forward
+        for (LineStatement ls : ir.getStatements()) {
+            if (ls == null) {
+                continue;
+            }
+            Instruction inst = ls.getInstruction();
+            if (!ls.isResolved() && inst != null && inst.getOperand() != null && inst.getOperand().getLabel() != null) {
+                int lookUpValue = lookUpTable.get(ls.getInstruction().getOperand().getLabel().getLabel()).getValue();
+                int address = ls.getAddress();
+                int value = Integer.parseInt(String.valueOf((0xFF & (lookUpValue - address))));
+
+                int[] arr = new int[ls.getAddressSize()];
+                arr[0] = keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode();
+                int buffSize = ls.getAddressSize() - 1;
+                ByteBuffer buff = ByteBuffer.allocate(buffSize);
+                buff.order(ByteOrder.BIG_ENDIAN);
+                if (buffSize == 1) {
+                    buff.put((byte) value);
+                } else {
+                    buff.putShort((short) value);
+                }
+                for (int i = 0; i < buffSize; i++) {
+                    arr[i + 1] = Integer.parseInt(StringUtils.getHexFromDecimal(buff.get(i), 2, false));
+                }
+                ls.setCode(arr);
+                ls.setResolved(true);
+            }
+        }
+        if (verbose) {
+            printVerbose(2);
+        }
+
+        for (int i = 1; i < ir.getStatements().size(); i++) {
+            LineStatement ls = ir.getStatements().get(i - 1);
             if (ls == null) {
                 continue;
             }
@@ -62,15 +147,13 @@ public class CodeGenerator implements ICodeGenerator {
             if (listing && lst != null) {
 
                 //Line
-                lst.append(StringUtils.getCustomFormat(4, linePosition, true));
-                ++linePosition;
+                lst.append(StringUtils.getCustomFormat(4, ls.getLineNumber(), true));
 
                 //Addr
                 lst.append(StringUtils.getCustomFormat(4, StringUtils.getHexFromDecimal(ls.getAddress(), 4, false), true));
 
                 //Machine code
-
-                lst.append(StringUtils.getCustomFormat(16, StringUtils.getHexStringFromIntArray(ls.getCode()) , true));
+                lst.append(StringUtils.getCustomFormat(16, StringUtils.getHexStringFromIntArray(ls.getCode()), true));
 
                 //Label
                 lst.append(StringUtils.getCustomFormat(16, ls.getLabel() != null ? ls.getLabel().getLabel() : "", true));
@@ -79,9 +162,11 @@ public class CodeGenerator implements ICodeGenerator {
                 if (ls.getDirective() != null) {
                     lst.append(StringUtils.getCustomFormat(16, ls.getDirective().getDirective(), true));
                     lst.append(StringUtils.getCustomFormat(16, ls.getDirective().getStringOperand(), true));
-                } else if (ls.getInstruction() != null && ls.getInstruction().getOperand() != null) {
+                } else if (ls.getInstruction() != null) {
                     lst.append(StringUtils.getCustomFormat(16, ls.getInstruction().getMnemonic().getValue(), true));
-                    lst.append(StringUtils.getCustomFormat(16, ls.getInstruction().getOperand().getValue(), true));
+                    if (ls.getInstruction().getOperand() != null) { // inherent does not have operand
+                        lst.append(StringUtils.getCustomFormat(16, ls.getInstruction().getOperand().getValue(), true));
+                    }
                 } else {
                     lst.append(StringUtils.getCustomFormat(16, "", true));
                     lst.append(StringUtils.getCustomFormat(16, "", true));
@@ -95,10 +180,6 @@ public class CodeGenerator implements ICodeGenerator {
                 lst.append("\r\n");
             }
         }
-        //Generate .exe here, need the machine code for this
-
-
-
 
         if (listing && lst != null) {
             try {
@@ -110,230 +191,83 @@ public class CodeGenerator implements ICodeGenerator {
                 e.printStackTrace();
             }
         }
-
-   /*     if (verbose)
-            System.out.println("Generating Listing\n");
-        StringBuilder lst = new StringBuilder();
-        // Shu: Changed the line to more closely match the prof's example.
-        lst.append("Line Addr Machine Code  Label         Mne         Operand             Comments\r\n");
-        int linePosition = 1;
-        int addr = 0;
-        for (LineStatement ls : ir.getStatements()) {
-            if (ls == null) {
-                //Error, should not have a null line statement though
-                continue;
-            }
-            //Begin Generating Opening of line statement
-            //Line
-            lst.append(StringUtils.getCustomFormat(5, linePosition));
-            ++linePosition;
-
-            //Addr
-            lst.append(StringUtils.getCustomFormat(5, StringUtils.getHexFromDecimal(addr, 4, false)));
-            // Shu: Code breaks if it's null. I'm not fully sure why because 7am brain. Maybe i'll figure it out in the morn.
-            if (ls.getInstruction() != null || ls.getDirective() != null) {
-                addr++;
-
-                if (ls.getInstruction() != null) {
-                    switch(keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode()) {
-                        case 0xD9:
-                        case 0xE0:
-                        case 0xB1:
-                        case 0xB2:
-                            addr++;
-                            break;
-                        case 0xD5:
-                            addr += 2;
-                            break;
-                    }
-//                    if (keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode() == 0xD9 ||
-//                        keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode() == 0xE0) {
-//                        addr++;
-//                    } else if (keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode() == 0xD5) {
-//                        addr += 2;
-//                    }
+        //Generating .exe
+        DataOutputStream outputStream;
+        try {
+            outputStream = new DataOutputStream(new FileOutputStream(fileName + ".exe"));
+            for (LineStatement ls : ir.getStatements()) {
+                for (int bytes : ls.getCode()) {
+                    outputStream.write(bytes);
                 }
             }
-
-            //Machine Code
-            if (ls.getInstruction() != null) {
-                Mnemonic mne = keyword.get(ls.getInstruction().getMnemonic().getValue());
-                lst.append(StringUtils.getCustomFormat(
-                        3,
-                        // Shu: pull the opcode and print that
-                        StringUtils.getHexFromDecimal(mne == null ? -1 : keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode(), 2, false)
-                ));
-            }
-
-            //Label
-            if (ls.getInstruction() != null) {
-                if (ls.getInstruction().getMnemonic().getMode().equals("relative")) {
-                    if (keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode() == 0xD9) {
-                        Mnemonic mne = keyword.get(ls.getInstruction().getMnemonic().getValue());
-                        lst.append(StringUtils.getCustomFormat(
-                                5,
-                                // Shu: pull the opcode and print that
-                                StringUtils.getHexFromDecimal(mne == null ? -1 : ls.getInstruction().getOperand().getOperand(), 2, false)
-                        ));
-                    }
-
-                    else if (keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode() == 0xD5) {
-                        String currentLabel = ls.getInstruction().getOperand().getLabel().getLabel();
-                        int addr2 = -1;
-                        for (LineStatement ls2 : ir.getStatements()) {
-
-                            if (ls2.getInstruction() != null || ls2.getDirective() != null) {
-                                addr2++;
-
-                                // Shu: I don't care anymore so im hardcoding it LOL
-                                if (ls.getInstruction() != null) {
-                                    switch(keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode()) {
-                                        case 0xD9:
-                                        case 0xE0:
-                                        case 0xB1:
-                                        case 0xB2:
-                                            addr2++;
-                                            break;
-                                        case 0xD5:
-                                            addr2 += 2;
-                                            break;
-                                    }
-//                                    if (keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode() == 0xD9 ||
-//                                            keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode() == 0xE0) {
-//                                        addr2++;
-//                                    } else if (keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode() == 0xD5) {
-//                                        addr2 += 2;
-//                                    }
-                                }
-                            }
-                            if (ls2.getDirective() == null) {
-                                continue;
-                            }
-                            if (currentLabel.equals(ls2.getLabel().getLabel())) {
-                                lst.append(StringUtils.getHexFromDecimal(addr2-addr, 4, false));
-                                lst.append(StringUtils.getCustomFormat(1, " "));
-                            }
-                        }
-                    }
-
-                    else if (keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode() == 0xE0) {
-                        String currentLabel = ls.getInstruction().getOperand().getLabel().getLabel();
-                        int addr2 = 0;
-                        for (LineStatement ls2 : ir.getStatements()) {
-
-                            if (ls2.getInstruction() != null || ls2.getDirective() != null) {
-                                addr2++;
-
-                                // Shu: I don't care anymore so im hardcoding it LOL
-                                if (ls.getInstruction() != null) {
-                                    switch(keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode()) {
-                                        case 0xD9:
-                                        case 0xE0:
-                                        case 0xB1:
-                                        case 0xB2:
-                                            addr2++;
-                                            break;
-                                        case 0xD5:
-                                            addr2 += 2;
-                                            break;
-                                    }
-//                                    if (keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode() == 0xD9 ||
-//                                            keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode() == 0xE0) {
-//                                        addr2++;
-//                                    } else if (keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode() == 0xD5) {
-//                                        addr2 += 2;
-//                                    }
-                                }
-                            }
-                            if (ls2.getInstruction() == null || ls2.getLabel() == null) {
-                                continue;
-                            }
-                            if (currentLabel.equals(ls2.getLabel().getLabel())) {
-                                String hex = StringUtils.getHexFromDecimal(addr2-addr, 2, false);
-                                lst.append(hex.length() > 2 ? hex.substring(6) : hex);
-                                lst.append(StringUtils.getCustomFormat(1, " "));
-                            }
-                        }
-
-
-                    }
-                }
-            }
-            //Temp mne null check, will function much smarter later on
-
-            // For directive
-            if (ls.getDirective() != null) {
-
-                char[] stringOperand = ls.getDirective().getStringOperand().toCharArray();
-                for (char ch : stringOperand) {
-                    if (ch == '\"') {
-                        continue;
-                    }
-                    lst.append(StringUtils.getHexFromDecimal(ch, 2, false));
-                    lst.append(StringUtils.getCustomFormat(1, " "));
-                    addr++;
-                }
-                lst.append(StringUtils.getHexFromDecimal(0, 2, false));
-                lst.append(StringUtils.getCustomFormat(1, " "));
-
-            }
-
-
-            //End Generating Opening of line statement
-
-            lst.append(StringUtils.getCustomFormat(10, " ")); // Padding between Code and Mne
-            //Begin Generating Closing of line statement
-            //Label
-            lst.append(StringUtils.getCustomFormat(3, ls.getLabel() == null ? " " : ls.getLabel().getLabel()));
-
-            lst.append(StringUtils.getCustomFormat(9, " "));// Padding between Label and Mne
-            //Mne
-            // Shu: Code breaks if it's null. I'm not fully sure why because 7am brain. Maybe i'll figure it out in the morn.
-            // Shu: Oh also added operand here because we need it now.
-            if (ls.getDirective() != null) {
-                lst.append(StringUtils.getCustomFormat(10, ls.getDirective().getDirective()));
-                lst.append(StringUtils.getCustomFormat(14, ls.getDirective().getStringOperand()));
-            } else if (ls.getInstruction() != null && ls.getInstruction().getOperand() != null) {
-                lst.append(StringUtils.getCustomFormat(10, ls.getInstruction().getMnemonic().getValue()));
-                lst.append(StringUtils.getCustomFormat(14, ls.getInstruction().getOperand().getValue()));
-            }
-            //Operand
-            //Comments
-            // Shu: Code breaks if it's null. I'm not fully sure why because 7am brain. Maybe i'll figure it out in the morn.
-            if (ls.getComment() != null) {
-                lst.append(ls.getComment().getComment());
-            }
-            //End Generating Closing of line statement
-            lst.append("\r\n");
+            outputStream.flush();
+            outputStream.close();
+            System.out.println("File " + fileName + ".exe has been successfully created");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("An error has occurred when creating " + fileName + ".exe");
+            System.exit(-1);
         }
-
-        //Xaavian: Not sure where to put for now, but this is to run after the first and second passes of the IR.
-        if (verbose) 
-            printVerbose(1, lst);
-
-        if (listing){
-            try {
-                FileOutputStream out = new FileOutputStream(fileName + ".lst");
-                out.write(lst.toString().getBytes());
-                out.close();
-                System.out.println("Done creating " + fileName + ".lst file.");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }*/
     }
 
-    private void printVerbose(int passNo, StringBuilder lst) {
+    private void assignAddresses() {
+        int address = 0;
+        for (int i = 1; i < ir.getStatements().size(); i++) {
+            LineStatement lineState = ir.getStatements().get(i - 1);
+            if (lineState == null) {
+                return;
+            }
+            lineState.setAddress(address);
+            address += lineState.getAddressSize();
+        }
+    }
+
+    private void printVerbose(int passNo) {
+        StringBuilder lst;
         System.out.println("Pass " + passNo + " Done.\n");
         if (passNo == 1) {
             System.out.println("SymbolTable: (after the first pass)\n");
+            String header = String.format("%-10s %-10s %-10s", "Name", "Type", "Addr/Code");
+            lst = new StringBuilder(header);
+            lst.append("\r\n");
+            for (Map.Entry<String, Pair<String, Integer>> entry : lookUpTable.getMap().entrySet()) {
+                lst.append(StringUtils.getCustomFormat(10, entry.getKey(), true));
+                lst.append(StringUtils.getCustomFormat(10, entry.getValue().getKey(), true));
+                lst.append(StringUtils.getCustomFormat(10, StringUtils.getHexFromDecimal(entry.getValue().getValue(), 4, false), true));
+                lst.append("\r\n");
+            }
+            System.out.println(lst.toString());
         }
-        //Xaavian: Can only implement following line when SymbolTable<??,??> labels becomes implemented
-        System.out.println("This is where the labels SymbolTable will go once implemented\n");
         System.out.println("Listing: (after the " + (passNo == 1 ? "first" : "second") + " pass)\n");
-        StringBuilder modlst = new StringBuilder();
-        modlst.append(lst.toString());
-        modlst.delete(0, 80);
-        System.out.println(modlst);
+        lst = new StringBuilder();
+        for (LineStatement ls : ir.getStatements()) {
+            if (ls == null || (ls.getInstruction() == null && ls.getDirective() == null)) {
+                continue;
+            }
+            lst.append(StringUtils.getCustomFormat(4, ls.getLineNumber(), true));
+
+            //Addr
+            lst.append(StringUtils.getCustomFormat(4, StringUtils.getHexFromDecimal(ls.getAddress(), 4, false), true));
+            //Machine code
+            lst.append(StringUtils.getCustomFormat(16, ls.isResolved() ? StringUtils.getHexStringFromIntArray(ls.getCode()) : (StringUtils.getHexStringFromIntArray(ls.getCode()) + "??"), true));
+
+            //Label
+            lst.append(StringUtils.getCustomFormat(16, ls.getLabel() != null ? ls.getLabel().getLabel() : "", true));
+
+            if (ls.getDirective() != null) {
+                lst.append(StringUtils.getCustomFormat(16, ls.getDirective().getDirective(), true));
+                lst.append(StringUtils.getCustomFormat(16, ls.getDirective().getStringOperand(), true));
+            } else if (ls.getInstruction() != null) {
+                lst.append(StringUtils.getCustomFormat(16, ls.getInstruction().getMnemonic().getValue(), true));
+                if (ls.getInstruction().getOperand() != null) { // inherent does not have operand
+                    lst.append(StringUtils.getCustomFormat(16, ls.getInstruction().getOperand().getValue(), true));
+                }
+            } else {
+                lst.append(StringUtils.getCustomFormat(16, "", true));
+                lst.append(StringUtils.getCustomFormat(16, "", true));
+            }
+            lst.append("\r\n");
+        }
+        System.out.println(lst.toString());
     }
 }

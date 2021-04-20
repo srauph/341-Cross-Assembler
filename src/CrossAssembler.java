@@ -15,6 +15,8 @@ public class CrossAssembler {
 
         //Will analyze the .asm for tokens
         LexicalScanner lexicalScanner = new LexicalScanner(options.getInputFile());
+        System.out.println(options.getInputFile() + " is being processed. Only CRLF files are supported.\r\n");
+
 
         //Using the lexical analyzer, parse them to generate a line of statements
 

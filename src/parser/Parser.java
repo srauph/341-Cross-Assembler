@@ -14,7 +14,7 @@ public class Parser implements IParser {
     private IntermediateRep ir = new IntermediateRep();
     private final LabelValidator labelValidator = new LabelValidator();
     private final LexicalScanner lexicalScanner;
-    private final SymbolTable<String, Mnemonic> keywords;
+    private final SymbolTable<String, Mnemonic> keyword;
     private Token nextToken;
     private final IErrorReporter errorReporter;
     private boolean isTesting = false;
@@ -28,7 +28,7 @@ public class Parser implements IParser {
     public Parser(LexicalScanner lexicalScanner, SymbolTable<String, Mnemonic> keywords, boolean verbose, IErrorReporter errorRep, boolean isTesting) {
         this.isTesting = isTesting;
         this.lexicalScanner = lexicalScanner;
-        this.keywords = keywords;
+        this.keyword = keywords;
         this.getNextToken();
         this.errorReporter = errorRep;
         this.verbose = verbose;
@@ -97,14 +97,23 @@ public class Parser implements IParser {
                     break;
                 case STRING_OPERAND:
                     if (ls.getDirective() != null) {
-                        ls.getDirective().setStringOperand(value);
+                        ls.getDirective().setStringOperand(value.replaceAll("\"", ""));
+                        String operand = ls.getDirective().getStringOperand();
+                        int size = operand.length() + 1;
+                        int[] arr = new int[size];
+                        for (int i = 0; i < size - 1; i++) {
+                            arr[i] = operand.charAt(i);
+                        }
+                        arr[size - 1] = 0;
+                        ls.setCode(arr);
+                        ls.setResolved(true);
                     }
                     break;
                 case COMMENT:           // If token is a comment
                     ls.setComment(new Comment(position, value));
                     break;
                 case MNEMONIC:          //If token is a mnemonic
-                    Mnemonic mnemonic = keywords.get(value);
+                    Mnemonic mnemonic = keyword.get(value);
 
                     if (mnemonic != null) {
                         ls.setInstruction(new Instruction(position, value)); // Set instruction
@@ -112,7 +121,13 @@ public class Parser implements IParser {
                         ls.getInstruction().setMnemonic(new Mnemonic(position, value));
                         ls.getInstruction().getMnemonic().setMode(mnemonic.getMode());
                         // Shu: Added this line
-                        ls.getInstruction().getMnemonic().setOpCode(keywords.get(value).getOpCode());
+                        ls.getInstruction().getMnemonic().setOpCode(keyword.get(value).getOpCode());
+
+                        if (ls.getInstruction().getMnemonic().getMode().equals("inherent")) {
+                            //machine code for inherent
+                            ls.setCode(new int[]{keyword.get(value).getOpCode()});
+                            ls.setResolved(true);
+                        }
                     } else {
                         invalidMnemonicErrorReporting(position);
                     }
@@ -126,30 +141,25 @@ public class Parser implements IParser {
                     // Operand error reporting
                     operandErrorReporting(ls, nextToken);
 
-                    Mnemonic mne = ls.getInstruction().getMnemonic();
-                    int opc = Integer.parseInt(value);
-                    try {
-                        switch (mne.getValue().split("\\.")[1]) {
-                            case "i3":
-                                if (opc < 0) {
-                                    opc += 8;
-                                }
-                                break;
-                            case "u5":
-                                if (opc < 16) {
-                                    opc += 16;
-                                } else {
-                                    opc -= 16;
-                                }
-                                break;
-                        }
-                    } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
-                    }
-                    opc += mne.getOpCode();
-                    ls.getInstruction().getMnemonic().setOpCode(opc); //Set mnemonic's opcode
                     Operand operand = new Operand(position, value);
                     operand.setOperand(Integer.parseInt(value));
-                    ls.getInstruction().setOperand(operand); //set instruction's opcode
+                    ls.getInstruction().setOperand(operand);
+
+                    //Assign their machine code
+                    if (ls.getInstruction() != null) {
+                        if (ls.getInstruction().getMnemonic() != null) {
+                            String mnemonicString = ls.getInstruction().getMnemonic().getValue();
+                            if (ls.getInstruction().getMnemonic().getMode().equals("immediate")) {
+                                //machine code for immediate
+                                ls.setCode(new int[]{keyword.get(mnemonicString).getOpCode() + ls.getInstruction().getOperand().getOperand()});
+                            } else if (ls.getInstruction().getMnemonic().getMode().equals("relative") && ls.getLabel() == null) {
+                                //machine code for relative
+                                ls.setCode(new int[]{keyword.get(ls.getInstruction().getMnemonic().getValue()).getOpCode(),
+                                        ls.getInstruction().getOperand().getOperand()});
+                            }
+                        }
+                        ls.setResolved(true);
+                    }
                     break;
                 default:
                     unknownTokenErrorReporting();
@@ -209,9 +219,9 @@ public class Parser implements IParser {
             // Extracting mnemonic name to check if it's not ldc.18, ldc.i16 or ldc.i32
             String[] mnemonicValue = ls.getInstruction().getMnemonic().getValue().split("\\.");
             if (mnemonicValue.length > 0) {
-                if ((ls.getInstruction() != null) && (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null)
+                if ((ls.getInstruction() != null) && (keyword.get(ls.getInstruction().getMnemonic().getValue()) != null)
                         && !mnemonicValue[0].equals("ldc") && !mnemonicValue[0].equals("ldv") && !mnemonicValue[0].equals("stv")) {
-                    if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("relative") &&
+                    if (keyword.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("relative") &&
                             (ls.getInstruction().getOperand().getLabel() == null)) {
                         ErrorMsg errorMsg = new ErrorMsg("Relative instruction operand must refer to a label.", nextToken.getPosition());
                         errorReporter.record(errorMsg);
@@ -230,9 +240,9 @@ public class Parser implements IParser {
      */
     private void instructionErrorReporting(LineStatement ls, Token nextToken) {
         // If there is no instruction, then we assume it's a line with only a comment and ignore it
-        if ((ls.getInstruction() != null) && (keywords.get(ls.getInstruction().getMnemonic().getValue()) != null)) {
-            if ((keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("relative") ||
-                    keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("immediate")) &&
+        if ((ls.getInstruction() != null) && (keyword.get(ls.getInstruction().getMnemonic().getValue()) != null)) {
+            if ((keyword.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("relative") ||
+                    keyword.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("immediate")) &&
                     ls.getInstruction().getOperand() == null) {
                 ErrorMsg errorMsg = new ErrorMsg("Instruction requires an operand.", nextToken.getPosition());
                 errorReporter.record(errorMsg);
@@ -255,7 +265,7 @@ public class Parser implements IParser {
         }
 
         // Checking if inherent instruction has an operand
-        else if (keywords.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && nextToken.getValue() != null) {
+        else if (keyword.get(ls.getInstruction().getMnemonic().getValue()).getMode().equals("inherent") && nextToken.getValue() != null) {
             ErrorMsg errorMsg = new ErrorMsg("Inherent instruction must not have an operand", nextToken.getPosition());
             errorReporter.record(errorMsg);
         }

@@ -30,4 +30,7 @@ public class SymbolTable<K, V> implements ISymbolTable<K, V> {
         return map.containsValue(value);
     }
 
+    public HashMap<K, V> getMap() {
+        return map;
+    }
 }
