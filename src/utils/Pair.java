@@ -1,6 +1,6 @@
 package utils;
 
-public class Pair<K, V> {
+public class Pair<K, V> implements IPair<K, V>{
 
     private final K key;
     private final V value;
@@ -10,9 +10,7 @@ public class Pair<K, V> {
         this.value = value;
     }
 
-    public K getKey() {
-        return key;
-    }
+    public K getKey() { return key; }
 
     public V getValue() {
         return value;
