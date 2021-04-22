@@ -1,6 +1,6 @@
 package utils;
 
-public class Pair<K, V> implements IPair<K, V>{
+public class Pair<K, V>{
 
     private final K key;
     private final V value;
