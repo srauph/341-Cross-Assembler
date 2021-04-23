@@ -161,7 +161,7 @@ public class CodeGenerator implements ICodeGenerator {
                 //Mnemonic & Operand
                 if (ls.getDirective() != null) {
                     lst.append(StringUtils.getCustomFormat(16, ls.getDirective().getDirective(), true));
-                    lst.append(StringUtils.getCustomFormat(16, ls.getDirective().getStringOperand(), true));
+                    lst.append(StringUtils.getCustomFormat(16, "\"" + ls.getDirective().getStringOperand() + "\"", true));
                 } else if (ls.getInstruction() != null) {
                     lst.append(StringUtils.getCustomFormat(16, ls.getInstruction().getMnemonic().getValue(), true));
                     if (ls.getInstruction().getOperand() != null) { // inherent does not have operand
@@ -256,7 +256,7 @@ public class CodeGenerator implements ICodeGenerator {
 
             if (ls.getDirective() != null) {
                 lst.append(StringUtils.getCustomFormat(16, ls.getDirective().getDirective(), true));
-                lst.append(StringUtils.getCustomFormat(16, ls.getDirective().getStringOperand(), true));
+                lst.append(StringUtils.getCustomFormat(16, "\"" + ls.getDirective().getStringOperand() + "\"", true));
             } else if (ls.getInstruction() != null) {
                 lst.append(StringUtils.getCustomFormat(16, ls.getInstruction().getMnemonic().getValue(), true));
                 if (ls.getInstruction().getOperand() != null) { // inherent does not have operand
